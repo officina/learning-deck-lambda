@@ -1,0 +1,26 @@
+{
+  "challengeid": "challenge_template_1",
+  "choices": [
+    {
+      "q": "domanda01",
+      "a": "1"
+    },
+    {
+      "q": "domanda02",
+      "a": "1"
+    },
+    {
+      "q": "domanda03",
+      "a": "2"
+    },
+    {
+      "q": "domanda04",
+      "a": "2"
+    },
+    {
+      "q": "domanda05",
+      "a": "1"
+    }
+  ],
+  "player": "max"
+}
