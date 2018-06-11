@@ -5,7 +5,7 @@ import time
 import os
 
 client_id = os.environ.get('PLAYOFF_CLIENT_ID')
-client_secret  =os.environ.get('PLAYOFF_CLIENT_SECRET')
+client_secret = os.environ.get('PLAYOFF_CLIENT_SECRET')
 tokenTableName = os.environ.get('DYNAMODB_TOKEN_TABLE')
 
 
@@ -89,7 +89,7 @@ def play_action(event, context):
         )
 
         result = pl.get(route="/admin/players/"+event["player"],)
-
+        # print(result)
         status = {}
         completed_challenges = []
         points = []
@@ -116,7 +116,7 @@ def play_action(event, context):
 
         response = {
             "statusCode": 200,
-            "playoff_response": r,
+            # "playoff_response": r,
             "body": { "world": {
                         "status": status,
                         "points": {
@@ -157,35 +157,34 @@ def play_action(event, context):
 
     return response
 
-
-def play_action_without_stored_token_retrieval(event, context):
-
-
-    pl = Playoff(
-        client_id=client_id,
-        client_secret=client_secret,
-        type="client",
-        allow_unsecure=True,
-
-    )
-
-    r = pl.post(
-        route="/runtime/actions/sfida1/play",
-        query={"player_id":"max"},
-        body={
-                "variables": {
-                    "question": 1,
-                    "answer": 2
-                }
-        }
-    )
-
-    response = {
-        "statusCode": 200,
-        "body": json.dumps(r)
-    }
-
-    return response
-
-
-
+# def play_action_without_stored_token_retrieval(event, context):
+#
+#
+#     pl = Playoff(
+#         client_id=client_id,
+#         client_secret=client_secret,
+#         type="client",
+#         allow_unsecure=True,
+#
+#     )
+#
+#     r = pl.post(
+#         route="/runtime/actions/sfida1/play",
+#         query={"player_id":"max"},
+#         body={
+#                 "variables": {
+#                     "question": 1,
+#                     "answer": 2
+#                 }
+#         }
+#     )
+#
+#     response = {
+#         "statusCode": 200,
+#         "body": json.dumps(r)
+#     }
+#
+#     return response
+#
+#
+#

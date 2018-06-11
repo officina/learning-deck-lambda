@@ -9,6 +9,7 @@ client_secret  ='MDc2ZGE1YjgtM2FjYS00MGYwLTg2YTQtYjY0OWVjNTViNzJjYzg3ZTVlNzAtNTM
 class TokenStorer:
     _token = ''
 
+    # for local development
     def set_token(self, token):
         f = open('saved_token.txt', 'w')
         s = str(token)
@@ -19,6 +20,7 @@ class TokenStorer:
         self._token = token
         #print("saving token " + str(token))
 
+    # for local development
     def get_token(self):
         f = open('saved_token.txt', 'r')
         ra = f.read()
@@ -27,6 +29,7 @@ class TokenStorer:
         #print("returning token " + str(self._token))
         return self._token
 
+    # saves the token on dynamodb
     def set_token_dynamo(self, token):
         import boto3
         dynamoDb = boto3.resource('dynamodb')
@@ -39,6 +42,7 @@ class TokenStorer:
                  "expires_at":str(token['expires_at'])
                   }
         )
+    # retrieves the token from dynamoDB
     def get_token_dynamo(self):
         import boto3
         dynamoDb = boto3.resource('dynamodb')
@@ -57,9 +61,7 @@ class TokenStorer:
 
         return d
 
-
 token_storer = TokenStorer()
-
 
 
 def play_action_with_stored_token_retrieval(times):
@@ -74,7 +76,7 @@ def play_action_with_stored_token_retrieval(times):
         store=lambda token: token_storer.set_token_dynamo(token),
         load=lambda: token_storer.get_token_dynamo()
     )
-    for i in range(1,times):
+    for i in range(1, times):
         pl.post(
             route="/runtime/actions/sfida1/play",
             query={"player_id":"max"},

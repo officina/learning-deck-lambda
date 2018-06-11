@@ -1,17 +1,17 @@
 from locust import HttpLocust, TaskSet, task
 
+
 class UserBehavior(TaskSet):
 
     @task(2)
     def with_token(self):
-        self.client.get("/dev/test/withtoken")
+        self.client.get("/dev/test/lambda")
 
     # @task(1)
     # def without_token(self):
     #     self.client.get("/dev/test/withouttoken")
 
     tasks = {with_token: 1}
-
 
 
 class WebsiteUser(HttpLocust):
