@@ -6,3 +6,4 @@ Una volta completato il setup del framework, le principali operazioni potranno e
 + **esecuzione locale della funzione play_action:** `sls invoke local -f play_action` 
 + **esecuzione della funzione play_action effettivamente deployata:** `sls invoke -f play_action`
 + **deploy della lambda su remoto:** `sls deploy`
++ **visualizzazione dei logs di play_action:** `sls logs -f play_action -t`
