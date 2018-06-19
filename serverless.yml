@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: aws-python3 # NOTE: update this with your service name
+service: mygenerali # NOTE: update this with your service name
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -23,10 +23,11 @@ provider:
   region: eu-west-1
   runtime: python3.6
   stage: dev
+  profile: mygenerali-dev
   environment:
      accountid: 123820204514
      #questo serve per far prendere a invoke local il profile
-     #AWS_PROFILE: default
+     #AWS_PROFILE: mygenerali-dev
      PROJECT_NAME: mygenerali-lambda
      PLAYOFF_CLIENT_ID: 'M2EzOWU4ZjUtM2Q5Yi00ZmE0LTkxNjYtOWM3MmFkMGNjNTIx'
      PLAYOFF_CLIENT_SECRET: 'MDc2ZGE1YjgtM2FjYS00MGYwLTg2YTQtYjY0OWVjNTViNzJjYzg3ZTVlNzAtNTM4OS0xMWU4LTlmMzctMjE2MGI4MDQ1OGMx'
