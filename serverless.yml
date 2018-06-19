@@ -29,9 +29,11 @@ provider:
      #AWS_PROFILE: default
      PROJECT_NAME: mygenerali-lambda
      PLAYOFF_CLIENT_ID: 'M2EzOWU4ZjUtM2Q5Yi00ZmE0LTkxNjYtOWM3MmFkMGNjNTIx'
-     PLAYOFF_CLIENT_SECRET: 'MDc2ZGE1YjgtM2FjYS00MGYwLTg2YTQtYjY0OWVjNTViNzJjYzg3ZTVlNzAtNTM4OS0xMWU4LTlmMzctMjE2MGI4MDQ1OGMx'
+     PLAYOFF_CLIENT_SECRET: 'MDc2ZGE1YjgtM2FjYS00MGYwLTg2YTQtYjY0OWVjNTViNzJjYzg3ZTVlNzAtNTM4OS0xMWU4LTlmMzctMjE2MGI4MDQ1OGMx',
      DYNAMODB_TOKEN_TABLE: playoff_token-${opt:stage, self:provider.stage}
      DYNAMODB_TOKEN_TABLE_ARN: "arn:aws:dynamodb:${opt:region, self:provider.region}:${self:provider.environment.accountid}:table/${self:provider.environment.DYNAMODB_TOKEN_TABLE}"
+     DYNAMODB_USERS_INFO_TABLE: users_info-${opt:stage, self:provider.stage}
+     DYNAMODB_USERS_INFO_TABLE_ARN: "arn:aws:dynamodb:${opt:region, self:provider.region}:${self:provider.environment.accountid}:table/${self:provider.environment.DYNAMODB_USERS_INFO_TABLE}"
   iamRoleStatements:
       - Effect: Allow
         Action:
@@ -157,6 +159,20 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: token
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    usersInfoTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Delete
+      Properties:
+        TableName: ${self:provider.environment.DYNAMODB_USERS_INFO_TABLE}
+        AttributeDefinitions:
+          - AttributeName: user_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: user_id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
