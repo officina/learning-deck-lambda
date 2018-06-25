@@ -44,6 +44,14 @@ provider:
           - dynamodb:UpdateItem
           - dynamodb:DeleteItem
         Resource: "${self:provider.environment.DYNAMODB_TOKEN_TABLE_ARN}"
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:DeleteItem
+        Resource: "${self:provider.environment.DYNAMODB_USERS_INFO_TABLE_ARN}"
 
 plugins:
   - serverless-python-requirements
