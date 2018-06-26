@@ -26,10 +26,10 @@
     "progress": {
         "ranking": 0.56,
         "params": {
-            "sicurezza": 67,
-            "salute": 67,
+            "sicurezza": 0.67,
+            "salute": 0.67,
             "sostenibilita": 0,
-            "risparmio": 67
+            "risparmio": 0.67
         }
     },
     "timestamp":1528806484751
