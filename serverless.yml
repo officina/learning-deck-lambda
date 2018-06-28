@@ -18,12 +18,13 @@ service: mygenerali # NOTE: update this with your service name
 # frameworkVersion: "=X.X.X"
 
 provider:
+  #endpointType: private
   name: aws
   memorySize: 512
   region: eu-west-1
   runtime: python3.6
-  stage: dev
-  profile: mygenerali-dev
+  stage: ${opt:stage, 'dev'}
+  profile: ${opt:profile, 'mygenerali-dev'}
   environment:
      accountid: 123820204514
      #questo serve per far prendere a invoke local il profile
@@ -99,7 +100,7 @@ functions:
 #          method: get
 #          cors: true
 
-  play_action:
+  play_action_get:
     handler: handler.play_action
     events:
       - http:
@@ -112,11 +113,25 @@ functions:
           path: test/withouttoken
           method: get
   get_user_status:
-    handler: handler.get_user_status
+    handler: handler_stub.get_user_status
     events:
       - http:
           path: api/userstatus
           method: get
+          cors: true
+  play_action:
+    handler: handler_stub.play_action
+    events:
+      - http:
+          path: api/play
+          method: post
+          cors: true
+  user_upgrade:
+    handler: handler_stub.user_upgrade
+    events:
+      - http:
+          path: api/userupgrade
+          method: post
           cors: true
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
