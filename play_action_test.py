@@ -166,7 +166,7 @@ def play_action_and_get_with_stored_token_retrieval(times):
 
         r1 = pl.get(
             route="/runtime/leaderboards/progressione_personale",
-            query={"player_id":"giovanni","cycle":"alltime","entity_id":"giovanni","radius":"0","sort":"descending","ranking":"relative"},
+            query={"player_id":"giovanni", "cycle":"alltime", "entity_id":"giovanni", "radius":"0",  "sort":"descending", "ranking":"relative"},
         )
 
         print(r1)
