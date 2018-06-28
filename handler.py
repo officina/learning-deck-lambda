@@ -188,3 +188,17 @@ def play_action(event, context):
 #
 #
 #
+
+
+def get_user_status(event, context):
+    print("*************************************")
+    print(event)
+    print("*************************************")
+    print(context)
+    print("*************************************")
+    response = {
+        "statusCode": 200,
+        "body": dict()
+    }
+
+    return response
