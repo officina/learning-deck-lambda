@@ -1,0 +1,59 @@
+{
+	'resource': '/api/userstatus',
+	'path': '/api/userstatus',
+	'httpMethod': 'GET',
+	'headers': {
+		'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+		'Accept-Encoding': 'gzip, deflate, br',
+		'Accept-Language': 'it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7',
+		'CloudFront-Forwarded-Proto': 'https',
+		'CloudFront-Is-Desktop-Viewer': 'true',
+		'CloudFront-Is-Mobile-Viewer': 'false',
+		'CloudFront-Is-SmartTV-Viewer': 'false',
+		'CloudFront-Is-Tablet-Viewer': 'false',
+		'CloudFront-Viewer-Country': 'IT',
+		'Host': 'enev8lpxng.execute-api.eu-west-1.amazonaws.com',
+		'upgrade-insecure-requests': '1',
+		'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36',
+		'Via': '2.0 be3a2ea70ea68d04665ee5db91a73443.cloudfront.net (CloudFront)',
+		'X-Amz-Cf-Id': 'FLDV8zxTJq83n87F1AhOqSrcj6x_2j9iYjh04lNjIPnbAWz8vZIuzQ==',
+		'X-Amzn-Trace-Id': 'Root=1-5b349864-c07cda4de8d414e8902481b7',
+		'X-Forwarded-For': '31.27.53.207, 52.46.26.49',
+		'X-Forwarded-Port': '443',
+		'X-Forwarded-Proto': 'https'
+	},
+	'queryStringParameters': {
+		'player': 'agasuzzu'
+	},
+	'pathParameters': None,
+	'stageVariables': None,
+	'requestContext': {
+		'resourceId': '39bqbu',
+		'resourcePath': '/api/userstatus',
+		'httpMethod': 'GET',
+		'extendedRequestId': 'JLy_oFTTjoEFnbw=',
+		'requestTime': '28/Jun/2018:08:12:20 +0000',
+		'path': '/dev/api/userstatus',
+		'accountId': '123820204514',
+		'protocol': 'HTTP/1.1',
+		'stage': 'dev',
+		'requestTimeEpoch': 1530173540037,
+		'requestId': 'fa7daff7-7aaa-11e8-a7bb-0df7c1a99851',
+		'identity': {
+			'cognitoIdentityPoolId': None,
+			'accountId': None,
+			'cognitoIdentityId': None,
+			'caller': None,
+			'sourceIp': '31.27.53.207',
+			'accessKey': None,
+			'cognitoAuthenticationType': None,
+			'cognitoAuthenticationProvider': None,
+			'userArn': None,
+			'userAgent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36',
+			'user': None
+		},
+		'apiId': 'enev8lpxng'
+	},
+	'body': None,
+	'isBase64Encoded': False
+}
