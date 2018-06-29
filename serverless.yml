@@ -101,13 +101,23 @@ functions:
 #          cors: true
 
   play_action_get:
-    handler: handler.play_action
+    handler: gamecontroller/handler.play_action
     events:
       - http:
           path: test/lambda
           method: get
+
+  user_status:
+     handler: gamecontroller/handler.user_status_action
+     events:
+       - http:
+           path: test/user_status
+           method: get
+
+
+
   play_action_without_stored_token_retrieval:
-    handler: handler.play_action_without_stored_token_retrieval
+    handler: gamecontroller/handler.play_action_without_stored_token_retrieval
     events:
       - http:
           path: test/withouttoken
