@@ -4,8 +4,8 @@ from gamecontroller import mapping
 
 
 class MappingTest(TestCase):
-    json_playoff = json.load(open('tests/get_user.json'))
-    json_response = json.load(open('tests/get_user_response.json'))
+    json_playoff = json.load(open('get_user.json'))
+    json_response = json.load(open('get_user_response.json'))
 
     @classmethod
     def setUp(self):
