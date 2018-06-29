@@ -1,5 +1,5 @@
 {
-  "challengeid": "challenge_template_1",
+  "challengeid": "storia01_capitolo01_sfida01",
   "choices": [
     {
       "q": "domanda01",
@@ -21,6 +21,5 @@
       "q": "domanda05",
       "a": "1"
     }
-  ],
-  "player": "lucia"
+  ]
 }

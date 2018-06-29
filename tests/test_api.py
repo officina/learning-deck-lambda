@@ -18,13 +18,13 @@ class ApiTest(TestCase):
         # self.after = mapping.Mapping(
         #     self.json_playoff, weeks=52, ranking=0.25).json['body']
     def test_play_action_is_online(self):
-        response = requests.post(
+        response = requests.patch(
             url=f"{self.prod_endpoint}/play",
         )
         self.assertIsNotNone(response.status_code)
 
     def test_userupgrade_is_online(self):
-        response = requests.post(
+        response = requests.patch(
             url=f"{self.prod_endpoint}/userupgrade",
         )
         self.assertIsNotNone(response.status_code)
@@ -37,7 +37,7 @@ class ApiTest(TestCase):
 
     def test_user_status(self):
         response = requests.get(
-            url=f"{self.prod_endpoint}/userstatus?player=giovanni",
+            url=f"{self.prod_endpoint}/userstatus/lucia",
         )
 
         self.assertEqual(response.status_code, 200)
@@ -53,17 +53,15 @@ class ApiTest(TestCase):
             self.fail(f"Schema validation failed with error:\n {error}")
 
     def test_play(self):
-        with open('./play_input.json', 'r') as f:
+        with open('./data/play_input.json', 'r') as f:
             input = f.read()
 
         data = json.loads(input)
 
-        response = requests.post(
-            url=f"{self.prod_endpoint}/play",
-            data = data
+        response = requests.patch(
+            url=f"{self.prod_endpoint}/play/lucia",
+            json=data
         )
-
-
 
         self.assertEqual(response.status_code, 200)
 
@@ -79,13 +77,13 @@ class ApiTest(TestCase):
 
 
     def test_userupgrade(self):
-        with open('./userupgrade_input.json', 'r') as f:
+        with open('./data/userupgrade_input.json', 'r') as f:
             input = f.read()
 
         data = json.loads(input)
 
-        response = requests.put(
-            url=f"{self.prod_endpoint}/play",
+        response = requests.patch(
+            url=f"{self.prod_endpoint}/levelupgrade/lucia",
             data=data
         )
 
