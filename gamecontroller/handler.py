@@ -41,6 +41,7 @@ def get_playoff_client():
 def get_user_status(event, context, player, playoff_client):
 
     result = playoff_client.get(route=f"/admin/players/{player}",)
+    print(result)
     result_ranking = playoff_client.get(
         route="/runtime/leaderboards/progressione_personale",
         query={
@@ -110,5 +111,5 @@ def play_action(event, context):
 def user_status_action(event, context):
 
     playoff_client = get_playoff_client()
-    player = event['queryStringParameters']['user_id']
+    player = event['queryStringParameters']['player']
     return get_user_status(event, context, player, playoff_client)
