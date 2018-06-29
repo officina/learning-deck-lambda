@@ -52,7 +52,6 @@ def playoff_error_response(message):
 
 def play_action(event, context):
     token_storer = TokenStorer()
-    print (event)
 
     pl = Playoff(
         client_id=client_id,

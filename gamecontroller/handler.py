@@ -11,7 +11,7 @@ from .dynamo_models import User, Token
 
 CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID')
 CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET')
-
+HOSTNAME = os.environ.get('PLAYOFF_HOSTNAME')
 # Utils
 
 
@@ -29,6 +29,7 @@ def playoff_error_response(message):
 
 def get_playoff_client():
     return Playoff(
+		hostname=HOSTNAME,
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         type="client",
@@ -75,40 +76,36 @@ def get_weeks(player):
 
 
 def play_action(event, context):
-    print(event)
+	print(event)
+	event_body = json.loads(event["body"])
+	playoff_client = get_playoff_client()
+	if "challengeid" not in event_body:
+		return invalid_response("no challenge id specified")
 
-    playoff_client = get_playoff_client()
-    if "challengeid" not in event:
-        return invalid_response("no challenge id specified")
+	if "choices" not in event_body or not isinstance(event_body["choices"], list):
+		return invalid_response("no choices specified")
 
-    if "player" not in event:
-        return invalid_response("no player specified")
+	choices = {var['q']: var['a'] for var in event_body['choices']}
+	player = event['pathParameters']['player']
 
-    if "choices" not in event or not isinstance(event["choices"], list):
-        return invalid_response("no choices specified")
+	try:
+		result_post = playoff_client.post(
+			route=f"/runtime/actions/{event_body['challengeid']}/play",
+			query={"player_id": player},
+			body={
+				"variables": choices
+			}
+		)
+	except PlayoffException as err:
+		if err.name == 'player_not_found':
+			return playoff_player_not_found_error_response(err.message)
+		else:
+			return playoff_error_response(err.message)
 
-    choices = {var['q']: var['a'] for var in event['choices']}
-    player = event['player']
-
-    try:
-        result_post = playoff_client.post(
-            route=f"/runtime/actions/{event['challengeid']}/play",
-            query={"player_id": player},
-            body={
-                "variables": choices
-            }
-        )
-    except PlayoffException as err:
-        if err.name == 'player_not_found':
-            return playoff_player_not_found_error_response(err.message)
-        else:
-            return playoff_error_response(err.message)
-
-    return get_user_status(event, context, player, playoff_client=playoff_client)
+	return get_user_status(event_body, context, player, playoff_client=playoff_client)
 
 
 def user_status_action(event, context):
-
-    playoff_client = get_playoff_client()
-    player = event['queryStringParameters']['user_id']
-    return get_user_status(event, context, player, playoff_client)
+	playoff_client = get_playoff_client()
+	player = event['pathParameters']['player']
+	return get_user_status(event, context, player, playoff_client)

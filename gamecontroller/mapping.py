@@ -45,8 +45,7 @@ RESPONSE = {
                 "sostenibilita": "100"
             }
         }
-    },
-    "timestamp": 1529706754
+    }
 }
 
 
@@ -69,15 +68,15 @@ class Mapping:
         self.response['body']['challenges'] = self.get_challenges(weeks)
         self.response['body']['progress']['params'] = self.get_progress()
         self.response['body']['progress']['ranking'] = ranking
-        self.response['timestamp'] = int(datetime.now().timestamp())
+        self.response['body']['timestamp'] = int(datetime.now().timestamp())
 
     def get_status(self):
 
         map = {
-            'livelli_casa': 'casa',
-            'livelli_mobilita': 'mobilita',
-            'livelli_mia_vita': 'vita',
-            'livelli_tempo_libero': 'tempo'
+            "livelli_casa": 'casa',
+            "livelli_mobilita": 'mobilita',
+            "livelli_mia_vita": 'vita',
+            "livelli_tempo_libero": 'tempo'
         }
 
         status = {}
@@ -124,17 +123,17 @@ class Mapping:
                             challenges += [f'{prefix}_C{j+1:05}']
 
         return {
-            'available': weeks,
-            'completed': challenges
+            "available": weeks,
+            "completed": challenges
         }
 
     def get_progress(self):
 
         progress = {
-            'sicurezza': 0,
-            'salute': 0,
-            'sostenibilita': 0,
-            'risparmio': 0,
+            "sicurezza": 0,
+            "salute": 0,
+            "sostenibilita": 0,
+            "risparmio": 0,
         }
         for score in self.result['scores']:
             if 'metric' in score and 'value' in score:
