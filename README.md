@@ -25,4 +25,5 @@ Per singoli test:
 Ho aggiunto al funzione che restituisce lo stato del giocatore che invoco come:
 
   serverless invoke local -f user_status -p tests/user.json
+  
   serverless invoke local -f play_action_get -p play_input.json
