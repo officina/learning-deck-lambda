@@ -109,7 +109,7 @@
               "type": "number"
             },
             "sostenibilita": {
-              "type": "integer"
+              "type": "number"
             },
             "risparmio": {
               "type": "number"
