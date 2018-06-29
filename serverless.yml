@@ -30,6 +30,7 @@ provider:
      #questo serve per far prendere a invoke local il profile
      #AWS_PROFILE: mygenerali-dev
      PROJECT_NAME: mygenerali-lambda
+     PLAYOFF_HOSTNAME: 'playoff.cc'
      PLAYOFF_CLIENT_ID: 'M2EzOWU4ZjUtM2Q5Yi00ZmE0LTkxNjYtOWM3MmFkMGNjNTIx'
      PLAYOFF_CLIENT_SECRET: 'MDc2ZGE1YjgtM2FjYS00MGYwLTg2YTQtYjY0OWVjNTViNzJjYzg3ZTVlNzAtNTM4OS0xMWU4LTlmMzctMjE2MGI4MDQ1OGMx'
      DYNAMODB_TOKEN_TABLE: playoff_token-${opt:stage, self:provider.stage}
@@ -80,26 +81,26 @@ functions:
 #          cors: true
 
   play_action:
-    handler: gamecontroller/handler.play_action
+    handler: handler_stub.play_action
     events:
       - http:
-          path: api/play
-          method: post
+          path: api/play/{player}
+          method: patch
           cors: true
 
   get_user_status:
     handler: handler_stub.user_status_action
     events:
       - http:
-          path: api/userstatus
+          path: api/userstatus/{player}
           method: get
           cors: true
-  user_upgrade:
-    handler: handler_stub.user_upgrade
+  level_upgrade:
+    handler: handler_stub.level_upgrade
     events:
       - http:
-          path: api/userupgrade
-          method: post
+          path: api/levelupgrade/{player}
+          method: patch
           cors: true
 
 #    The following are a few example events you can configure
