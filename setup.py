@@ -26,6 +26,7 @@ setup(
         #'six==1.11.0',
         'pynamodb==3.3.0',
         'pytz',
+        'simplejson',
 
     ],
     zip_safe=False,

@@ -29,7 +29,7 @@ def playoff_error_response(message):
 
 def get_playoff_client():
     return Playoff(
-		hostname=HOSTNAME,
+        hostname=HOSTNAME,
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         type="client",
@@ -53,7 +53,7 @@ def get_user_status(event, context, player, playoff_client):
             "ranking": "relative"
         })
     # get_weeks is the only action of Mapping that would require aws, so I leave it here
-    ranking = (result_ranking['data'][0]['rank']/result_ranking['total']*100)/100
+    ranking = (result_ranking['data'][0]['rank'] / result_ranking['total'] * 100) / 100
 
     weeks = get_weeks(player)
 
@@ -76,36 +76,48 @@ def get_weeks(player):
 
 
 def play_action(event, context):
-	print(event)
-	event_body = json.loads(event["body"])
-	playoff_client = get_playoff_client()
-	if "challengeid" not in event_body:
-		return invalid_response("no challenge id specified")
+    print(event)
+    event_body = json.loads(event["body"])
+    playoff_client = get_playoff_client()
+    if "challengeid" not in event_body:
+        return invalid_response("no challenge id specified")
 
-	if "choices" not in event_body or not isinstance(event_body["choices"], list):
-		return invalid_response("no choices specified")
+    if "choices" not in event_body or not isinstance(event_body["choices"], list):
+        return invalid_response("no choices specified")
 
-	choices = {var['q']: var['a'] for var in event_body['choices']}
-	player = event['pathParameters']['player']
+    choices = {var['q']: var['a'] for var in event_body['choices']}
+    player = event['pathParameters']['player']
 
-	try:
-		result_post = playoff_client.post(
-			route=f"/runtime/actions/{event_body['challengeid']}/play",
-			query={"player_id": player},
-			body={
-				"variables": choices
-			}
-		)
-	except PlayoffException as err:
-		if err.name == 'player_not_found':
-			return playoff_player_not_found_error_response(err.message)
-		else:
-			return playoff_error_response(err.message)
+    try:
+        result_post = playoff_client.post(
+            route=f"/runtime/actions/{event_body['challengeid']}/play",
+            query={"player_id": player},
+            body={
+                "variables": choices
+            }
+        )
+    except PlayoffException as err:
+        if err.name == 'player_not_found':
+            return playoff_player_not_found_error_response(err.message)
+        else:
+            return playoff_error_response(err.message)
 
-	return get_user_status(event_body, context, player, playoff_client=playoff_client)
+    return get_user_status(event_body, context, player, playoff_client=playoff_client)
 
 
-def user_status_action(event, context):
-	playoff_client = get_playoff_client()
-	player = event['pathParameters']['player']
-	return get_user_status(event, context, player, playoff_client)
+def level_upgrade_action(event, context):
+
+    playoff_client = get_playoff_client()
+    player = event['pathParameters']['player']
+    map = {
+        "casa": 'compra_casa_livello',
+        "mobilita": 'compra_mobilita_livello',
+        "vita": 'compra_mia_vita',
+        "tempo": 'compra_tempo_libero'
+    }
+    data = event['body']
+    key = f'{map[data["id"]]}_{data["newLevel"]}'
+    end_point = f'/runtime/actions/{key}/play'
+
+    result_post = playoff_client.post(end_point, query={"player_id": player},)
+    return get_user_status(event, context, player, playoff_client)
