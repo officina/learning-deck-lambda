@@ -11,7 +11,7 @@ from .dynamo_models import User, Token
 
 CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID')
 CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET')
-
+HOSTNAME = os.environ.get('PLAYOFF_HOSTNAME')
 # Utils
 
 
@@ -29,6 +29,7 @@ def playoff_error_response(message):
 
 def get_playoff_client():
     return Playoff(
+        hostname=HOSTNAME,
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         type="client",
@@ -52,7 +53,7 @@ def get_user_status(event, context, player, playoff_client):
             "ranking": "relative"
         })
     # get_weeks is the only action of Mapping that would require aws, so I leave it here
-    ranking = (result_ranking['data'][0]['rank']/result_ranking['total']*100)/100
+    ranking = (result_ranking['data'][0]['rank'] / result_ranking['total'] * 100) / 100
 
     weeks = get_weeks(player)
 
@@ -76,23 +77,20 @@ def get_weeks(player):
 
 def play_action(event, context):
     print(event)
-
+    event_body = json.loads(event["body"])
     playoff_client = get_playoff_client()
-    if "challengeid" not in event:
+    if "challengeid" not in event_body:
         return invalid_response("no challenge id specified")
 
-    if "player" not in event:
-        return invalid_response("no player specified")
-
-    if "choices" not in event or not isinstance(event["choices"], list):
+    if "choices" not in event_body or not isinstance(event_body["choices"], list):
         return invalid_response("no choices specified")
 
-    choices = {var['q']: var['a'] for var in event['choices']}
-    player = event['player']
+    choices = {var['q']: var['a'] for var in event_body['choices']}
+    player = event['pathParameters']['player']
 
     try:
         result_post = playoff_client.post(
-            route=f"/runtime/actions/{event['challengeid']}/play",
+            route=f"/runtime/actions/{event_body['challengeid']}/play",
             query={"player_id": player},
             body={
                 "variables": choices
@@ -104,11 +102,22 @@ def play_action(event, context):
         else:
             return playoff_error_response(err.message)
 
-    return get_user_status(event, context, player, playoff_client=playoff_client)
+    return get_user_status(event_body, context, player, playoff_client=playoff_client)
 
 
-def user_status_action(event, context):
+def level_upgrade_action(event, context):
 
     playoff_client = get_playoff_client()
-    player = event['queryStringParameters']['user_id']
+    player = event['pathParameters']['player']
+    map = {
+        "casa": 'compra_casa_livello',
+        "mobilita": 'compra_mobilita_livello',
+        "vita": 'compra_mia_vita',
+        "tempo": 'compra_tempo_libero'
+    }
+    data = json.loads(event["body"])
+    key = f'{map[data["id"]]}_{data["newLevel"]}'
+    end_point = f'/runtime/actions/{key}/play'
+
+    result_post = playoff_client.post(end_point, query={"player_id": player},)
     return get_user_status(event, context, player, playoff_client)

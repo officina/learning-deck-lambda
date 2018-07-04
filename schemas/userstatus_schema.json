@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "world": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "object",
+          "properties": {
+            "casa": {
+              "type": "integer"
+            },
+            "mobilita": {
+              "type": "integer"
+            },
+            "vita": {
+              "type": "integer"
+            },
+            "tempo": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "casa",
+            "mobilita",
+            "vita",
+            "tempo"
+          ]
+        },
+        "points": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer"
+            },
+            "available": {
+              "type": "integer"
+            },
+            "upgrade": {
+              "type": "object",
+              "properties": {
+                "casa": {
+                  "type": "integer"
+                },
+                "mobilita": {
+                  "type": "integer"
+                },
+                "vita": {
+                  "type": "integer"
+                },
+                "tempo": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "casa",
+                "mobilita",
+                "vita",
+                "tempo"
+              ]
+            }
+          },
+          "required": [
+            "total",
+            "available",
+            "upgrade"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "points"
+      ]
+    },
+    "challenges": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "integer"
+        },
+        "completed": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "available",
+        "completed"
+      ]
+    },
+    "progress": {
+      "type": "object",
+      "properties": {
+        "ranking": {
+          "type": "number"
+        },
+        "params": {
+          "type": "object",
+          "properties": {
+            "sicurezza": {
+              "type": "number"
+            },
+            "salute": {
+              "type": "number"
+            },
+            "sostenibilita": {
+              "type": "number"
+            },
+            "risparmio": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "sicurezza",
+            "salute",
+            "sostenibilita",
+            "risparmio"
+          ]
+        }
+      },
+      "required": [
+        "ranking",
+        "params"
+      ]
+    },
+    "timestamp": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "world",
+    "challenges",
+    "progress",
+    "timestamp"
+  ]
+}

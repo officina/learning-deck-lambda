@@ -26,10 +26,11 @@ provider:
   stage: ${opt:stage, 'dev'}
   profile: ${opt:profile, 'mygenerali-dev'}
   environment:
-     accountid: 123820204514
+     accountid: '123820204514'
      #questo serve per far prendere a invoke local il profile
      #AWS_PROFILE: mygenerali-dev
      PROJECT_NAME: mygenerali-lambda
+     PLAYOFF_HOSTNAME: 'playoff.cc'
      PLAYOFF_CLIENT_ID: 'M2EzOWU4ZjUtM2Q5Yi00ZmE0LTkxNjYtOWM3MmFkMGNjNTIx'
      PLAYOFF_CLIENT_SECRET: 'MDc2ZGE1YjgtM2FjYS00MGYwLTg2YTQtYjY0OWVjNTViNzJjYzg3ZTVlNzAtNTM4OS0xMWU4LTlmMzctMjE2MGI4MDQ1OGMx'
      DYNAMODB_TOKEN_TABLE: playoff_token-${opt:stage, self:provider.stage}
@@ -39,57 +40,36 @@ provider:
   iamRoleStatements:
       - Effect: Allow
         Action:
+          - dynamodb:DescribeTable
           - dynamodb:Query
           - dynamodb:GetItem
           - dynamodb:PutItem
           - dynamodb:UpdateItem
           - dynamodb:DeleteItem
-        Resource: "${self:provider.environment.DYNAMODB_TOKEN_TABLE_ARN}"
+          - dynamodb:Query
+          - dynamodb:Scan
+        Resource: "*"
       - Effect: Allow
         Action:
+          - dynamodb:DescribeTable
           - dynamodb:Query
           - dynamodb:GetItem
           - dynamodb:PutItem
           - dynamodb:UpdateItem
           - dynamodb:DeleteItem
         Resource: "${self:provider.environment.DYNAMODB_USERS_INFO_TABLE_ARN}"
-
 plugins:
   - serverless-python-requirements
 
-
-# you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
-
-# you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
-# you can add packaging information here
-#package:
-#  include:
-#    - include-me.py
-#    - include-me-dir/**
-#  exclude:
-#    - exclude-me.py
-#    - exclude-me-dir/**
+package:
+  exclude:
+    - node_modules/**
+    - README.md
+    - package.json
+    - package-lock.json
+    - requirements.txt
+  include:
+    - gamecontroller/**
 
 functions:
 #  play_action_without_stored_token_retrieval:
@@ -100,49 +80,29 @@ functions:
 #          method: get
 #          cors: true
 
-  play_action_get:
-    handler: gamecontroller/handler.play_action
-    events:
-      - http:
-          path: test/lambda
-          method: get
-
-  user_status:
-     handler: gamecontroller/handler.user_status_action
-     events:
-       - http:
-           path: test/user_status
-           method: get
-
-
-
-  play_action_without_stored_token_retrieval:
-    handler: gamecontroller/handler.play_action_without_stored_token_retrieval
-    events:
-      - http:
-          path: test/withouttoken
-          method: get
-  get_user_status:
-    handler: handler_stub.get_user_status
-    events:
-      - http:
-          path: api/userstatus
-          method: get
-          cors: true
   play_action:
     handler: handler_stub.play_action
     events:
       - http:
-          path: api/play
-          method: post
+          path: api/play/{player}
+          method: patch
           cors: true
-  user_upgrade:
-    handler: handler_stub.user_upgrade
+
+  get_user_status:
+    handler: handler_stub.user_status_action
     events:
       - http:
-          path: api/userupgrade
-          method: post
+          path: api/userstatus/{player}
+          method: get
           cors: true
+  level_upgrade:
+    handler: handler_stub.level_upgrade
+    events:
+      - http:
+          path: api/levelupgrade/{player}
+          method: patch
+          cors: true
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
