@@ -115,7 +115,7 @@ def level_upgrade_action(event, context):
         "vita": 'compra_mia_vita',
         "tempo": 'compra_tempo_libero'
     }
-    data = event['body']
+    data = json.loads(event["body"])
     key = f'{map[data["id"]]}_{data["newLevel"]}'
     end_point = f'/runtime/actions/{key}/play'
 

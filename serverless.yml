@@ -26,7 +26,7 @@ provider:
   stage: ${opt:stage, 'dev'}
   profile: ${opt:profile, 'mygenerali-dev'}
   environment:
-     accountid: 123820204514
+     accountid: '123820204514'
      #questo serve per far prendere a invoke local il profile
      #AWS_PROFILE: mygenerali-dev
      PROJECT_NAME: mygenerali-lambda
