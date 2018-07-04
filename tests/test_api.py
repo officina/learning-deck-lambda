@@ -75,16 +75,17 @@ class ApiTest(TestCase):
         except ValidationError as error:
             self.fail(f"Schema validation failed with error:\n {error}")
 
-
     def test_userupgrade(self):
-        with open('./data/userupgrade_input.json', 'r') as f:
+        with open('./data/levelupgrade_input.json', 'r') as f:
             input = f.read()
 
         data = json.loads(input)
 
+        print(data)
+
         response = requests.patch(
             url=f"{self.prod_endpoint}/levelupgrade/lucia",
-            data=data
+            json=data
         )
 
 
