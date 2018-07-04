@@ -105,6 +105,12 @@ def play_action(event, context):
     return get_user_status(event_body, context, player, playoff_client=playoff_client)
 
 
+def user_status_action(event, context):
+    playoff_client = get_playoff_client()
+    player = event['pathParameters']['player']
+    return get_user_status(event, context, player, playoff_client)
+
+
 def level_upgrade_action(event, context):
 
     playoff_client = get_playoff_client()
