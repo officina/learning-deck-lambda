@@ -66,7 +66,9 @@ def get_weeks(player):
         user_player = User.get(player)
         weeks = user_player.unblocked_weeks
     except User.DoesNotExist:
+        User(player).save()
         weeks = 1
+
     return weeks
 
 #/api/play
