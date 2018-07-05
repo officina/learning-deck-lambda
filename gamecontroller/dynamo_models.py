@@ -21,6 +21,11 @@ class User(Model):
     user_id = attributes.UnicodeAttribute(hash_key=True)
     date_start = attributes.UTCDateTimeAttribute()
 
+    def save(self, *args, **kwargs):
+        if not self.date_start:
+            self.date_start = datetime.now().astimezone(pytz.UTC)
+        return super().save(*args, **kwargs)
+
     @property
     def unblocked_weeks(self):
         weeks = (datetime.now().astimezone(pytz.UTC) - self.date_start).days // 7
