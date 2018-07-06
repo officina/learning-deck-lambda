@@ -29,7 +29,7 @@ class User(Model):
     @property
     def unblocked_weeks(self):
         weeks = (datetime.now().astimezone(pytz.UTC) - self.date_start).days // 7
-        return (weeks + 1) if weeks < 8 else 8
+        return weeks + 1
 
 
 class Token(Model):
