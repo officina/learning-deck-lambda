@@ -1,2 +1,2 @@
 #!/bin/sh
-sls deploy --stage qa --profile mygenerali-prod
+sls deploy --stage qa --profile mygenerali-prod --endpointType edge

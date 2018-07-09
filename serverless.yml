@@ -18,10 +18,10 @@ service: mygenerali # NOTE: update this with your service name
 # frameworkVersion: "=X.X.X"
 
 provider:
-  #endpointType: private
+  endpointType: ${opt:endpointType, 'private'}
   name: aws
   memorySize: 512
-  region: eu-west-1
+  region: eu-central-1
   runtime: python3.6
   stage: ${opt:stage, 'dev'}
   profile: ${opt:profile, 'mygenerali-dev'}
