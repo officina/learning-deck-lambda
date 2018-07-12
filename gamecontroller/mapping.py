@@ -118,9 +118,9 @@ class Mapping:
                     m = re.search('(?P<story_id>\d\d)_.*(?P<ch_id>\d\d)', metric['name'])
                     if m:
                         info = {k: int(v) for k, v in m.groupdict().items()}
-                        prefix = 'S{story_id:02}_CH{ch_id:02}'.format(**info)
+                        prefix = 'S{story_id:02}_C{ch_id:02}'.format(**info)
                         for j, challenge in enumerate(score['value']):
-                            challenges += [f'{prefix}_C{j+1:05}']
+                            challenges += [f'{prefix}_CH{j+1:05}']
 
         return {
             "available": weeks,

@@ -152,8 +152,6 @@ def play_action(event, context):
         else:
             return playoff_error_response(err.message)
 
-
-
     return response
 
 # def play_action_without_stored_token_retrieval(event, context):

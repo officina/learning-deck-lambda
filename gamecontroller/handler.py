@@ -120,8 +120,8 @@ def level_upgrade_action(event, context):
     map = {
         "casa": 'compra_casa_livello',
         "mobilita": 'compra_mobilita_livello',
-        "vita": 'compra_mia_vita',
-        "tempo": 'compra_tempo_libero'
+        "vita": 'compra_mia_vita_livello',
+        "tempo": 'compra_tempo_libero_livello'
     }
     data = json.loads(event["body"])
     key = f'{map[data["id"]]}_{data["newLevel"]}'
