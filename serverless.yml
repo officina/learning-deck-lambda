@@ -85,7 +85,7 @@ functions:
     events:
       - http:
           path: api/play/{player}
-          method: patch
+          method: put
           cors: true
 
   get_user_status:
@@ -100,7 +100,7 @@ functions:
     events:
       - http:
           path: api/levelupgrade/{player}
-          method: patch
+          method: put
           cors: true
 
 #    The following are a few example events you can configure
