@@ -7,8 +7,10 @@ import jsonschema
 from jsonschema import  validate,  ValidationError
 
 class ApiTest(TestCase):
-    prod_endpoint = 'https://xz4740jwrg.execute-api.eu-west-1.amazonaws.com/prod/api'
-    dev_endpoint = 'https://xz4740jwrg.execute-api.eu-west-1.amazonaws.com/dev/api'
+    # prod_endpoint = 'https://xz4740jwrg.execute-api.eu-west-1.amazonaws.com/prod/api'
+    prod_endpoint = "https://cqj2wl89n9.execute-api.eu-central-1.amazonaws.com/dev/api"
+    # qa_endpoint = 'https://7h4zux15wi.execute-api.eu-central-1.amazonaws.com/prod/api' #fix it
+    dev_endpoint = 'https://cqj2wl89n9.execute-api.eu-central-1.amazonaws.com/dev/api'
 
 
 
@@ -52,13 +54,13 @@ class ApiTest(TestCase):
         except ValidationError as error:
             self.fail(f"Schema validation failed with error:\n {error}")
 
-    def test_play(self):
+    def old_test_play(self):
         with open('./data/play_input.json', 'r') as f:
             input = f.read()
 
         data = json.loads(input)
 
-        response = requests.patch(
+        response = requests.put(
             url=f"{self.prod_endpoint}/play/lucia",
             json=data
         )
@@ -83,7 +85,7 @@ class ApiTest(TestCase):
 
         print(data)
 
-        response = requests.patch(
+        response = requests.put(
             url=f"{self.prod_endpoint}/levelupgrade/lucia",
             json=data
         )
