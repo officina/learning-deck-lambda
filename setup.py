@@ -27,6 +27,8 @@ setup(
         'pynamodb==3.3.0',
         'pytz',
         'simplejson',
+        'jsonschema==2.6.0'
+
 
     ],
     zip_safe=False,
