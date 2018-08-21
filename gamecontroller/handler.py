@@ -156,15 +156,15 @@ def level_upgrade_action(event, context):
 
 def auth(event, context):
     print(event)
-    caller_ip = event['headers']['X-Forwarded-For']
+    caller_ip = event['headers']['X-Forwarded-For'].split(",")[0]
     dynamo_db = boto3.resource('dynamodb').Table(os.environ['DYNAMODB_IP_AUTH_TABLE'])
     key = dict()
     key["ip"] = caller_ip
     response_result = dynamo_db.get_item(Key=key)
-    return generatePolicy(1, 'Allow', event['methodArn'])
-    # if "Item" in response_result:
-    #     print(f'{caller_ip} authorized')
-    #     return generatePolicy(caller_ip, 'Allow', event['methodArn'])
-    # else:
-    #     print(f'{caller_ip} unauthorized')
-    #     return generatePolicy(caller_ip, 'Deny', event['methodArn'])
+    # return generatePolicy(1, 'Allow', event['methodArn'])
+    if "Item" in response_result:
+        print(f'{caller_ip} authorized')
+        return generatePolicy(caller_ip, 'Allow', event['methodArn'])
+    else:
+        print(f'{caller_ip} unauthorized')
+        return generatePolicy(caller_ip, 'Deny', event['methodArn'])
