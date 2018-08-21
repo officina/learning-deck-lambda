@@ -84,7 +84,7 @@ functions:
           path: api/play/{player}
           method: put
           cors: true
-
+          authorizer: ${self:custom.authorizer.users}
   get_user_status:
     handler: handler_stub.user_status_action
     events:
@@ -100,6 +100,7 @@ functions:
           path: api/levelupgrade/{player}
           method: put
           cors: true
+          authorizer: ${self:custom.authorizer.users}
 
 resources:
   Resources:
