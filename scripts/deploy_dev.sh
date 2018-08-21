@@ -1,2 +1,2 @@
 #!/bin/sh
-sls deploy --profile mygenerali-dev --endpointType edge
+sls deploy --profile mygenerali-dev

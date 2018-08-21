@@ -8,6 +8,7 @@ import simplejson as sjson
 
 
 def user_status_action(event, context):
+    print(event)
     result = GameController.user_status_action(event, context)
     response = {
         'statusCode': result['statusCode'],
@@ -45,7 +46,7 @@ def play_action(event, context):
 
 
 def level_upgrade(event, context):
-
+    print(event)
     result = GameController.level_upgrade_action(event, context)
     response = {
         'statusCode': result['statusCode'],
@@ -55,5 +56,5 @@ def level_upgrade(event, context):
 
 
 def auth(event, context):
-    
+    print(event)
     return GameController.auth(event, context)

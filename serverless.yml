@@ -18,7 +18,7 @@ service: mygenerali # NOTE: update this with your service name
 # frameworkVersion: "=X.X.X"
 
 provider:
-  endpointType: ${opt:endpointType, 'private'}
+  #endpointType: ${opt:endpointType, 'private'}
   name: aws
   memorySize: 512
   region: eu-central-1
@@ -74,9 +74,8 @@ package:
     - gamecontroller/**
 
 functions:
-  auth:
+  authorizerUser:
     handler: handler_stub.auth
-    cors: true
 
   play_action:
     handler: handler_stub.play_action
@@ -93,7 +92,7 @@ functions:
           path: api/userstatus/{player}
           method: get
           cors: true
-          authorizer: auth
+          authorizer: ${self:custom.authorizer.users}
   level_upgrade:
     handler: handler_stub.level_upgrade
     events:
@@ -146,3 +145,9 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+custom:
+  authorizer:
+      users:
+        name: authorizerUser
+        type: request
+        identitySource: method.request.header.X-Forwarded-For

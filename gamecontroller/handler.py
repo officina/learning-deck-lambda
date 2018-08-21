@@ -73,11 +73,11 @@ def get_weeks(player):
     return weeks
 
 
-def generatePolicy(principal_id, effect, method_arn):
+def generatePolicy(ip, effect, resource):
     auth_response = dict()
-    auth_response['principalId'] = principal_id
+    auth_response['principalId'] = 'User'
 
-    if effect and method_arn:
+    if effect and resource:
         policy_document = {
             'Version': '2012-10-17',
             'Statement': [
@@ -85,7 +85,7 @@ def generatePolicy(principal_id, effect, method_arn):
                     'Sid': 'FirstStatement',
                     'Action': 'execute-api:Invoke',
                     'Effect': effect,
-                    'Resource': method_arn
+                    'Resource': resource
                 }
             ]
         }
@@ -161,9 +161,10 @@ def auth(event, context):
     key = dict()
     key["ip"] = caller_ip
     response_result = dynamo_db.get_item(Key=key)
-    if "Item" in response_result:
-        print(f'{caller_ip} authorized')
-        return generatePolicy('user', 'Allow', event['methodArn'])
-    else:
-        print(f'{caller_ip} unauthorized')
-        return generatePolicy(None, 'Deny', event['methodArn'])
+    return generatePolicy(1, 'Allow', event['methodArn'])
+    # if "Item" in response_result:
+    #     print(f'{caller_ip} authorized')
+    #     return generatePolicy(caller_ip, 'Allow', event['methodArn'])
+    # else:
+    #     print(f'{caller_ip} unauthorized')
+    #     return generatePolicy(caller_ip, 'Deny', event['methodArn'])
