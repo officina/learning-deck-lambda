@@ -52,3 +52,8 @@ def level_upgrade(event, context):
         'body': json.dumps(result['body'])
     }
     return response
+
+
+def auth(event, context):
+    
+    return GameController.auth(event, context)

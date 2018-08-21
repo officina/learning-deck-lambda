@@ -6,6 +6,7 @@ import json
 import time
 import os
 from .mapping import Mapping
+import boto3
 
 from .dynamo_models import User, Token
 
@@ -71,6 +72,28 @@ def get_weeks(player):
 
     return weeks
 
+
+def generatePolicy(principal_id, effect, method_arn):
+    auth_response = dict()
+    auth_response['principalId'] = principal_id
+
+    if effect and method_arn:
+        policy_document = {
+            'Version': '2012-10-17',
+            'Statement': [
+                {
+                    'Sid': 'FirstStatement',
+                    'Action': 'execute-api:Invoke',
+                    'Effect': effect,
+                    'Resource': method_arn
+                }
+            ]
+        }
+
+        auth_response['policyDocument'] = policy_document
+
+    return auth_response
+
 #/api/play
 #/api/user_status?user_id=<user>
 
@@ -129,3 +152,18 @@ def level_upgrade_action(event, context):
 
     result_post = playoff_client.post(end_point, query={"player_id": player},)
     return get_user_status(event, context, player, playoff_client)
+
+
+def auth(event, context):
+    print(event)
+    caller_ip = event['headers']['X-Forwarded-For']
+    dynamo_db = boto3.resource('dynamodb').Table(os.environ['DYNAMODB_IP_AUTH_TABLE'])
+    key = dict()
+    key["ip"] = caller_ip
+    response_result = dynamo_db.get_item(Key=key)
+    if "Item" in response_result:
+        print(f'{caller_ip} authorized')
+        return generatePolicy('user', 'Allow', event['methodArn'])
+    else:
+        print(f'{caller_ip} unauthorized')
+        return generatePolicy(None, 'Deny', event['methodArn'])
