@@ -147,7 +147,8 @@ resources:
           WriteCapacityUnits: 1
 custom:
   authorizer:
-      users:
-        name: authorizerUser
-        type: request
-        identitySource: method.request.header.X-Forwarded-For
+    users:
+      name: authorizerUser
+      type: request
+      identitySource: method.request.header.X-Forwarded-For
+      resultTtlInSeconds: ${opt:resultTtlInSeconds, '0'}

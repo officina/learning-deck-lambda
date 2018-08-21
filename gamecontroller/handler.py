@@ -73,9 +73,9 @@ def get_weeks(player):
     return weeks
 
 
-def generatePolicy(ip, effect, resource):
+def generate_policy(ip, effect, resource):
     auth_response = dict()
-    auth_response['principalId'] = 'User'
+    auth_response['principalId'] = ip
 
     if effect and resource:
         policy_document = {
@@ -156,6 +156,8 @@ def level_upgrade_action(event, context):
 
 def auth(event, context):
     print(event)
+    # necessario lo split, vedi qui:
+    # https://stackoverflow.com/questions/33062097/how-can-i-retrieve-a-users-public-ip-address-via-amazon-api-gateway-lambda-n
     caller_ip = event['headers']['X-Forwarded-For'].split(",")[0]
     dynamo_db = boto3.resource('dynamodb').Table(os.environ['DYNAMODB_IP_AUTH_TABLE'])
     key = dict()
@@ -164,7 +166,7 @@ def auth(event, context):
     # return generatePolicy(1, 'Allow', event['methodArn'])
     if "Item" in response_result:
         print(f'{caller_ip} authorized')
-        return generatePolicy(caller_ip, 'Allow', event['methodArn'])
+        return generate_policy(caller_ip, 'Allow', event['methodArn'])
     else:
         print(f'{caller_ip} unauthorized')
-        return generatePolicy(caller_ip, 'Deny', event['methodArn'])
+        return generate_policy(caller_ip, 'Deny', event['methodArn'])
