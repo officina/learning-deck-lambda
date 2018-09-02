@@ -95,12 +95,21 @@ functions:
           path: api/userstatus/{player}
           method: get
           cors: true
+
   level_upgrade:
     handler: handler_stub.level_upgrade
     events:
       - http:
           path: api/levelupgrade/{player}
           method: put
+          cors: true
+
+  get_lazy_users:
+    handler: handler_stub.get_lazy_users
+    events:
+      - http:
+          path: api/lazyusers/{from}
+          method: get
           cors: true
 
 #    The following are a few example events you can configure

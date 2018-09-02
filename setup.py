@@ -11,7 +11,7 @@ setup(
     install_requires=[
         'setuptools',
         #'asn1crypto==0.24.0',
-        'boto3==1.7.30',
+        'boto3==1.8.3',
         #'botocore==1.10.30',
         #'cffi==1.11.5',
         #'cryptography==1.9',

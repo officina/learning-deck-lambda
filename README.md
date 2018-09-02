@@ -22,8 +22,12 @@ Per singoli test:
 
 ##
 
-Ho aggiunto al funzione che restituisce lo stato del giocatore che invoco come:
+Ho aggiunto la funzione che restituisce lo stato del giocatore che invoco come:
 
   serverless invoke local -f user_status -p tests/user.json
-  
+
   serverless invoke local -f play_action_get -p play_input.json
+
+Giocatori che non hanno giocato da una certa data:
+
+serverless invoke local -f get_lazy_users -p tests/data/sls-get_lazy_users.json

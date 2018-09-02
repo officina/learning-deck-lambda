@@ -1,12 +1,13 @@
 # coding: utf-8
 
-import json
-from playoff import Playoff, PlayoffException
+import os
 import json
 import time
-import os
-from .mapping import Mapping
+from datetime import datetime
 
+from playoff import Playoff, PlayoffException
+
+from .mapping import Mapping
 from .dynamo_models import User, Token
 
 CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID')
@@ -41,7 +42,7 @@ def get_playoff_client():
 
 def get_user_status(event, context, player, playoff_client):
 
-    result = playoff_client.get(route=f"/admin/players/{player}",)
+    result = playoff_client.get(route=f"/admin/players/{player}")
     result_ranking = playoff_client.get(
         route="/runtime/leaderboards/progressione_personale",
         query={
@@ -129,3 +130,20 @@ def level_upgrade_action(event, context):
 
     result_post = playoff_client.post(end_point, query={"player_id": player},)
     return get_user_status(event, context, player, playoff_client)
+
+
+def get_lazy_users(event, context):
+    """return a list of player that played last time before 'from'
+    'from' is passed as a parameter
+    """
+    playoff_client = get_playoff_client()
+    from_iso = event['pathParameters']['from']
+    from_date = datetime.strptime(from_iso, '%Y-%m-%d')
+    users = []
+    for user in User.get_lazy_users(from_date):
+        users += [{
+            'user_id': user.user_id,
+            'date_last_play': user.date_last_play
+        }]
+
+    return users

@@ -52,3 +52,13 @@ def level_upgrade(event, context):
         'body': json.dumps(result['body'])
     }
     return response
+
+
+def get_lazy_users(event, context):
+
+    result = GameController.get_lazy_users(event, context)
+    response = {
+        'statusCode': 200,
+        'body': json.dumps(result)
+    }
+    return response
