@@ -18,7 +18,7 @@ service: mygenerali # NOTE: update this with your service name
 # frameworkVersion: "=X.X.X"
 
 provider:
-  #endpointType: ${opt:endpointType, 'private'}
+  endpointType: ${opt:endpointType, 'private'}
   name: aws
   memorySize: 512
   region: eu-central-1
@@ -60,9 +60,6 @@ provider:
           - dynamodb:UpdateItem
           - dynamodb:DeleteItem
         Resource: "${self:provider.environment.DYNAMODB_USERS_INFO_TABLE_ARN}"
-plugins:
-  - serverless-python-requirements
-
 package:
   exclude:
     - node_modules/**
@@ -84,7 +81,7 @@ functions:
           path: api/play/{player}
           method: put
           cors: true
-          authorizer: ${self:custom.authorizer.users}
+          authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
   get_user_status:
     handler: handler_stub.user_status_action
     events:
@@ -92,7 +89,7 @@ functions:
           path: api/userstatus/{player}
           method: get
           cors: true
-          authorizer: ${self:custom.authorizer.users}
+          authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
   level_upgrade:
     handler: handler_stub.level_upgrade
     events:
@@ -100,52 +97,10 @@ functions:
           path: api/levelupgrade/{player}
           method: put
           cors: true
-          authorizer: ${self:custom.authorizer.users}
-
+          authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
 resources:
   Resources:
-    tokenTable:
-      Type: AWS::DynamoDB::Table
-      DeletionPolicy: Delete
-      Properties:
-        TableName: ${self:provider.environment.DYNAMODB_TOKEN_TABLE}
-        AttributeDefinitions:
-          - AttributeName: token
-            AttributeType: S
-        KeySchema:
-          - AttributeName: token
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    usersInfoTable:
-      Type: AWS::DynamoDB::Table
-      DeletionPolicy: Delete
-      Properties:
-        TableName: ${self:provider.environment.DYNAMODB_USERS_INFO_TABLE}
-        AttributeDefinitions:
-          - AttributeName: user_id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: user_id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-    ipAuthTable:
-      Type: AWS::DynamoDB::Table
-      DeletionPolicy: Delete
-      Properties:
-        TableName: ${self:provider.environment.DYNAMODB_IP_AUTH_TABLE}
-        AttributeDefinitions:
-          - AttributeName: ip
-            AttributeType: S
-        KeySchema:
-          - AttributeName: ip
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+    ${file(config/configs-${opt:stage, self:provider.stage}.yml):additionalResources}
 custom:
   authorizer:
     users:
@@ -153,3 +108,6 @@ custom:
       type: request
       identitySource: method.request.header.X-Forwarded-For
       resultTtlInSeconds: ${opt:resultTtlInSeconds, '0'}
+
+plugins:
+  - serverless-python-requirements
