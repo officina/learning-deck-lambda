@@ -18,7 +18,7 @@ service: mygenerali # NOTE: update this with your service name
 # frameworkVersion: "=X.X.X"
 
 provider:
-  endpointType: ${opt:endpointType, 'private'}
+  endpointType: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalEndPointType}
   name: aws
   memorySize: 512
   region: eu-central-1

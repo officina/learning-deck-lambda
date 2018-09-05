@@ -1,4 +1,5 @@
 globalAuthorizer:
+globalEndPointType: private
 additionalResources:
   tokenTable:
     Type: AWS::DynamoDB::Table
