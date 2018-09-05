@@ -1,4 +1,4 @@
-globalAuthorizer:
+globalAuthorizer: ""
 globalEndPointType: private
 additionalResources:
   tokenTable:
