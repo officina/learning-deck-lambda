@@ -27,8 +27,6 @@ provider:
   profile: ${opt:profile, 'mygenerali-dev'}
   environment:
      accountid: '123820204514'
-     #questo serve per far prendere a invoke local il profile
-     #AWS_PROFILE: mygenerali-dev
      PROJECT_NAME: mygenerali-lambda
      PLAYOFF_HOSTNAME: 'playoff.cc'
      PLAYOFF_CLIENT_ID: 'M2EzOWU4ZjUtM2Q5Yi00ZmE0LTkxNjYtOWM3MmFkMGNjNTIx'
