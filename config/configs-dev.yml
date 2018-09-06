@@ -1,0 +1,45 @@
+globalAuthorizer: ${self:custom.authorizer.users}
+globalEndPointType: ""
+additionalResources:
+  tokenTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    Properties:
+      TableName: ${self:provider.environment.DYNAMODB_TOKEN_TABLE}
+      AttributeDefinitions:
+        - AttributeName: token
+          AttributeType: S
+      KeySchema:
+        - AttributeName: token
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+  usersInfoTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    Properties:
+      TableName: ${self:provider.environment.DYNAMODB_USERS_INFO_TABLE}
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+  ipAuthTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    Properties:
+      TableName: ${self:provider.environment.DYNAMODB_IP_AUTH_TABLE}
+      AttributeDefinitions:
+        - AttributeName: ip
+          AttributeType: S
+      KeySchema:
+        - AttributeName: ip
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1

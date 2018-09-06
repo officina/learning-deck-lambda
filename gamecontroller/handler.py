@@ -4,6 +4,9 @@ import os
 import json
 import time
 from datetime import datetime
+import os
+from .mapping import Mapping
+import boto3
 
 from playoff import Playoff, PlayoffException
 
@@ -71,6 +74,28 @@ def get_weeks(player):
         weeks = 1
 
     return weeks
+
+
+def generate_policy(ip, effect, resource):
+    auth_response = dict()
+    auth_response['principalId'] = ip
+
+    if effect and resource:
+        policy_document = {
+            'Version': '2012-10-17',
+            'Statement': [
+                {
+                    'Sid': 'FirstStatement',
+                    'Action': 'execute-api:Invoke',
+                    'Effect': effect,
+                    'Resource': resource
+                }
+            ]
+        }
+
+        auth_response['policyDocument'] = policy_document
+
+    return auth_response
 
 #/api/play
 #/api/user_status?user_id=<user>
@@ -147,3 +172,21 @@ def get_lazy_users(event, context):
         }]
 
     return users
+
+def auth(event, context):
+    print(event)
+    # necessario lo split, vedi qui:
+    # https://stackoverflow.com/questions/33062097/how-can-i-retrieve-a-users-public-ip-address-via-amazon-api-gateway-lambda-n
+    caller_ip = event['headers']['X-Forwarded-For'].split(",")[0]
+    dynamo_db = boto3.resource('dynamodb').Table(os.environ['DYNAMODB_IP_AUTH_TABLE'])
+    key = dict()
+    key["ip"] = caller_ip
+    response_result = dynamo_db.get_item(Key=key)
+    # return generatePolicy(1, 'Allow', event['methodArn'])
+    if "Item" in response_result:
+        print(f'{caller_ip} authorized')
+        return generate_policy(caller_ip, 'Allow', event['methodArn'])
+    else:
+        print(f'{caller_ip} unauthorized')
+        return generate_policy(caller_ip, 'Deny', event['methodArn'])
+
