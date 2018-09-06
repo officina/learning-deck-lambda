@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from pynamodb.models import Model
 from pynamodb import attributes
 from boto3.dynamodb.conditions import Key, Attr
+import time
 
 # Defaults are handy when testing iteractively
 USERS_TABLE_NAME = os.environ.get('DYNAMODB_USERS_INFO_TABLE') or 'users_info-dev'
@@ -38,6 +39,13 @@ class User(Model):
     def save_last_play(self, now=None):
         self.date_last_play = (now or datetime.now()).astimezone(pytz.UTC)
         return self.save()
+
+    @property
+    def date_last_play_timestamp_format(self):
+        if self.date_last_play:
+            return int(time.mktime(self.date_last_play.timetuple()))
+        else:
+            return 0
 
     @property
     def unblocked_weeks(self):

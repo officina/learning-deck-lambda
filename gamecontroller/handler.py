@@ -60,8 +60,9 @@ def get_user_status(event, context, player, playoff_client):
     ranking = (result_ranking['data'][0]['rank'] / result_ranking['total'] * 100) / 100
 
     weeks = get_weeks(player)
+    date_last_play = User.get(player).date_last_play_timestamp_format
 
-    return Mapping(result, weeks, ranking=ranking).json
+    return Mapping(result, weeks, ranking=ranking, date_last_play=date_last_play).json
 
 
 def get_weeks(player):
@@ -155,7 +156,8 @@ def level_upgrade_action(event, context):
     end_point = f'/runtime/actions/{key}/play'
 
     result_post = playoff_client.post(end_point, query={"player_id": player},)
-    User.get(player).save_last_play()
+    # per ora consideriamo non necessario l'aggiornamento della data eseguendo un level upgrade
+    # User.get(player).save_last_play()
     return get_user_status(event, context, player, playoff_client)
 
 
@@ -163,6 +165,7 @@ def get_lazy_users(event, context):
     """return a list of player that played last time before 'from'
     'from' is passed as a parameter
     """
+    print(event)
     playoff_client = get_playoff_client()
     from_iso = event['pathParameters']['from']
     from_date = datetime.strptime(from_iso, '%Y-%m-%d')
@@ -170,7 +173,7 @@ def get_lazy_users(event, context):
     for user in User.get_lazy_users(from_date):
         users += [{
             'user_id': user.user_id,
-            'date_last_play': user.date_last_play
+            'lastPlayed': user.date_last_play_timestamp_format
         }]
 
     return users
