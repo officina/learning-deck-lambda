@@ -124,6 +124,7 @@ def play_action(event, context):
                 "variables": choices
             }
         )
+        User.get(player).save_last_play()
     except PlayoffException as err:
         if err.name == 'player_not_found':
             return playoff_player_not_found_error_response(err.message)
@@ -154,6 +155,7 @@ def level_upgrade_action(event, context):
     end_point = f'/runtime/actions/{key}/play'
 
     result_post = playoff_client.post(end_point, query={"player_id": player},)
+    User.get(player).save_last_play()
     return get_user_status(event, context, player, playoff_client)
 
 
