@@ -60,11 +60,10 @@ provider:
         Resource: "${self:provider.environment.DYNAMODB_USERS_INFO_TABLE_ARN}"
 package:
   exclude:
-    - node_modules/**
-    - README.md
-    - package.json
-    - package-lock.json
-    - requirements.txt
+    - 'node_modules/**'
+    - 'README.md'
+    - 'package.json'
+    - 'package-lock.json'
   include:
     - gamecontroller/**
 
@@ -113,6 +112,10 @@ custom:
       type: request
       identitySource: method.request.header.X-Forwarded-For
       resultTtlInSeconds: ${opt:resultTtlInSeconds, '0'}
+  prune:
+    automatic: true
+    number: 3
 
 plugins:
   - serverless-python-requirements
+  - serverless-prune-plugin

@@ -1,4 +1,5 @@
-globalAuthorizer: ${self:custom.authorizer.users}
+#globalAuthorizer: ${self:custom.authorizer.users}
+globalAuthorizer: ""
 globalEndPointType: ""
 additionalResources:
   tokenTable:
