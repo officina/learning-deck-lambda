@@ -5,13 +5,13 @@ from datetime import datetime, timedelta
 
 from pynamodb.models import Model
 from pynamodb import attributes
-from boto3.dynamodb.conditions import Key, Attr
 import time
 
 # Defaults are handy when testing iteractively
 USERS_TABLE_NAME = os.environ.get('DYNAMODB_USERS_INFO_TABLE') or 'users_info-dev'
+USERS_READY_TABLE_NAME = os.environ.get('DYNAMODB_USERS_READY_INFO_TABLE') or 'users_info_ready-dev'
 TOKEN_TABLE_NAME = os.environ.get('DYNAMODB_TOKEN_TABLE') or 'playoff_token-dev'
-REGION = os.environ.get('AWS_REGION') or 'eu-west-1'
+REGION = os.environ.get('AWS_REGION') or 'eu-central-1'
 
 
 class User(Model):
@@ -25,7 +25,7 @@ class User(Model):
     date_last_play = attributes.UTCDateTimeAttribute(null=True)
 
     @classmethod
-    def get_lazy_users(cls, date=None, days=None):
+    def get_lazy_users(cls, date=None, days=None, state="PUBLISHED"):
         date = (date or datetime.now()).astimezone(pytz.UTC)
         if days:
             date = date - timedelta(days=days)
@@ -51,6 +51,20 @@ class User(Model):
     def unblocked_weeks(self):
         weeks = (datetime.now().astimezone(pytz.UTC) - self.date_start).days // 7
         return weeks + 1
+
+
+class UserReady(User):
+    class Meta:
+        table_name = USERS_READY_TABLE_NAME
+        region = REGION
+
+    # @property
+    # def date_last_play_timestamp_format(self):
+    #     return super(User, self).date_last_play_timestamp_format
+    #
+    # @property
+    # def unblocked_weeks(self):
+    #     return super(User, self).unblocked_weeks
 
 
 class Token(Model):
