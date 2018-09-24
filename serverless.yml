@@ -29,8 +29,7 @@ provider:
      accountid: '123820204514'
      PROJECT_NAME: mygenerali-lambda
      PLAYOFF_HOSTNAME: ${opt:playoff_hostname, 'playoff.cc'}
-     PLAYOFF_CLIENT_ID: 'M2EzOWU4ZjUtM2Q5Yi00ZmE0LTkxNjYtOWM3MmFkMGNjNTIx'
-     PLAYOFF_CLIENT_SECRET: 'MDc2ZGE1YjgtM2FjYS00MGYwLTg2YTQtYjY0OWVjNTViNzJjYzg3ZTVlNzAtNTM4OS0xMWU4LTlmMzctMjE2MGI4MDQ1OGMx'
+
      DYNAMODB_TOKEN_TABLE: playoff_token-${opt:stage, self:provider.stage}
      DYNAMODB_TOKEN_TABLE_ARN: "arn:aws:dynamodb:${opt:region, self:provider.region}:${self:provider.environment.accountid}:table/${self:provider.environment.DYNAMODB_TOKEN_TABLE}"
 
@@ -45,8 +44,8 @@ provider:
 
      PLAYOFF_CLIENT_ID_READY: "${self:custom.secrets.PLAYOFF_CLIENT_ID_READY}"
      PLAYOFF_CLIENT_SECRET_READY: "${self:custom.secrets.PLAYOFF_CLIENT_SECRET_READY}"
-     PLAYOFF_CLIENT_ID_PUBLISHED: "${self:custom.secrets.PLAYOFF_CLIENT_ID_READY}"
-     PLAYOFF_CLIENT_SECRET_PUBLISHED: "${self:custom.secrets.PLAYOFF_CLIENT_SECRET_READY}"
+     PLAYOFF_CLIENT_ID_PUBLISHED: "${self:custom.secrets.PLAYOFF_CLIENT_ID_PUBLISHED}"
+     PLAYOFF_CLIENT_SECRET_PUBLISHED: "${self:custom.secrets.PLAYOFF_CLIENT_SECRET_PUBLISHED}"
 
   iamRoleStatements:
       - Effect: Allow

@@ -78,7 +78,9 @@
          "https"
       ]
    },
-   "queryStringParameters": "",
+   "queryStringParameters": {
+      "state":"READY2"
+   },
    "multiValueQueryStringParameters":{
       "state":[
          "READY"

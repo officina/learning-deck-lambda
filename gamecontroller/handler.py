@@ -30,14 +30,12 @@ def playoff_error_response(message):
 
 
 def get_playoff_client(state='PUBLISHED'):
-
     if state == 'READY':
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_READY')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_READY')
     else:
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_PUBLISHED')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_PUBLISHED')
-
 
     return Playoff(
         hostname=HOSTNAME,
@@ -149,19 +147,25 @@ def play_action(event, context):
             }
         )
         if state_ == 'READY':
-            UserReady.get(user_id=player, state=state_).save_last_play()
+            try:
+                UserReady.get(player).save_last_play()
+            except UserReady.DoesNotExist:
+                UserReady(player).save()
+                UserReady.get(player).save_last_play()
         else:
-            User.get(user_id=player, state=state_).save_last_play()
+            try:
+                User.get(player).save_last_play()
+            except User.DoesNotExist:
+                User(player).save()
+                User.get(player).save_last_play()
+
     except PlayoffException as err:
         print(err)
         if err.name == 'player_not_found':
-            print(1)
             return playoff_player_not_found_error_response(err.message)
         else:
-            print(2)
             return playoff_error_response(err.message)
-    print(3)
-    return get_user_status(event_body, context, player, playoff_client=playoff_client)
+    return get_user_status(event, context, player, playoff_client=playoff_client)
 
 
 def user_status_action(event, context):
@@ -214,7 +218,6 @@ def get_lazy_users(event, context):
         temp_users = UserReady.get_lazy_users(from_date)
     else:
         temp_users = User.get_lazy_users(from_date)
-    print(temp_users)
     for user in temp_users:
         users += [{
             'user_id': user.user_id,
