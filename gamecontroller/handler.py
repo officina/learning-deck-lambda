@@ -30,6 +30,7 @@ def playoff_error_response(message):
 
 
 def get_playoff_client(state='PUBLISHED'):
+    print("Client Playoff creation!!")
     if state == 'READY':
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_READY')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_READY')
@@ -49,11 +50,19 @@ def get_playoff_client(state='PUBLISHED'):
 
 
 def get_user_status(event, context, player, playoff_client):
-
+    print("Connecting to Playoff")
     state_ = "PUBLISHED"
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
-    result = playoff_client.get(route=f"/admin/players/{player}")
+    try:
+        result = playoff_client.get(route=f"/admin/players/{player}")
+    except PlayoffException as err:
+        print(err)
+        if err.name == 'player_not_found':
+            return playoff_player_not_found_error_response(err.message)
+        else:
+            return playoff_error_response(err.message)
+    print(result)
     result_ranking = playoff_client.get(
         route="/runtime/leaderboards/progressione_personale",
         query={

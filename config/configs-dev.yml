@@ -1,6 +1,7 @@
 #globalAuthorizer: ${self:custom.authorizer.users}
 globalAuthorizer: ""
 globalEndPointType: ""
+globalVpc: ""
 additionalResources:
   tokenTable:
     Type: AWS::DynamoDB::Table

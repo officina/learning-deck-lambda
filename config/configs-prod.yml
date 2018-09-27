@@ -1,5 +1,11 @@
 globalAuthorizer: ""
 globalEndPointType: private
+globalVpc:
+  securityGroupIds:
+    - sg-029dd5f46a5b67377
+  subnetIds:
+    - subnet-967d5dfe
+    - subnet-0084e87a
 additionalResources:
   tokenTable:
     Type: AWS::DynamoDB::Table
@@ -42,4 +48,4 @@ additionalResources:
           KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 1
-        WriteCapacityUnits: 1 
+        WriteCapacityUnits: 1

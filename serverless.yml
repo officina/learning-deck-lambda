@@ -18,9 +18,7 @@ service: mygenerali # NOTE: update this with your service name
 # frameworkVersion: "=X.X.X"
 
 provider:
-#  apiGateway:
-#    restApiId: "4hpa9l79pf"
-#    restApiRootResourceId: "4hpa9l79pf"
+  vpc: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalVpc}
   endpointType: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalEndPointType}
   name: aws
   memorySize: 512
