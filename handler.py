@@ -152,8 +152,6 @@ def play_action(event, context):
         else:
             return playoff_error_response(err.message)
 
-
-
     return response
 
 # def play_action_without_stored_token_retrieval(event, context):
@@ -190,11 +188,6 @@ def play_action(event, context):
 
 
 def get_user_status(event, context):
-    print("*************************************")
-    print(event)
-    print("*************************************")
-    print(context)
-    print("*************************************")
     response = {
         "statusCode": 200,
         "body": dict()

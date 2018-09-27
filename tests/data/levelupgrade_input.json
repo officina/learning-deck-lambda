@@ -1,9 +1,4 @@
 {
-    "body": {
     "id": "casa",
-    "newLevel": "2"
-   },
-   "pathParameters":{
-      "player": "giovanni"
-   }
+    "newLevel": "1"
 }

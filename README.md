@@ -22,8 +22,17 @@ Per singoli test:
 
 ##
 
-Ho aggiunto al funzione che restituisce lo stato del giocatore che invoco come:
+Ho aggiunto la funzione che restituisce lo stato del giocatore che invoco come:
 
   serverless invoke local -f user_status -p tests/user.json
-  
+
   serverless invoke local -f play_action_get -p play_input.json
+
+Giocatori che non hanno giocato da una certa data:
+
+serverless invoke local -f get_lazy_users -p tests/data/sls-get_lazy_users.json
+
+
+## Scripts
+All'interno della cartella scripts, oltre agli script per il deploy è presente lo script `clean_game_for_tests.py` che esegue la cancellazione 
+di tutti i player di un gioco. E' necessario settare direttmaent e nello script il client che consente di accedere al gioco di interesse.

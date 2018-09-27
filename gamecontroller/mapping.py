@@ -51,7 +51,7 @@ RESPONSE = {
 
 class Mapping:
 
-    def __init__(self, result, weeks, ranking):
+    def __init__(self, result, weeks, ranking, date_last_play=0):
         """
         :arg result: il risultato dell'interrogazione dello stato a playoff
         :arg weeks: le settimane sbloccate
@@ -69,6 +69,7 @@ class Mapping:
         self.response['body']['progress']['params'] = self.get_progress()
         self.response['body']['progress']['ranking'] = ranking
         self.response['body']['timestamp'] = int(datetime.now().timestamp())
+        self.response['body']['lastPlayed'] = date_last_play
 
     def get_status(self):
 
@@ -118,9 +119,9 @@ class Mapping:
                     m = re.search('(?P<story_id>\d\d)_.*(?P<ch_id>\d\d)', metric['name'])
                     if m:
                         info = {k: int(v) for k, v in m.groupdict().items()}
-                        prefix = 'S{story_id:02}_CH{ch_id:02}'.format(**info)
+                        prefix = 'S{story_id:02}_C{ch_id:02}'.format(**info)
                         for j, challenge in enumerate(score['value']):
-                            challenges += [f'{prefix}_C{j+1:05}']
+                            challenges += [f'{prefix}_CH{j+1:05}']
 
         return {
             "available": weeks,

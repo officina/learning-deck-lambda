@@ -1,0 +1,37 @@
+{
+    "world": {
+        "status": {
+            "casa": 0, 
+            "mobilita": 0,
+            "vita": 0,
+            "tempo": 0
+        },
+        "points": {
+            "total": 20,
+            "available": 10,
+            "upgrade": {
+                "casa": 10,
+                "mobilita": 10,
+                "vita": 10,
+                "tempo": 10
+            }
+        }
+    },
+    "challenges": {
+        "available": 52,
+        "completed": [
+          "S01_CH01_C00001"
+        ]
+    },
+    "progress": {
+        "ranking": 0.25,
+        "params": {
+            "sicurezza": 0.67,
+            "salute": 0.67,
+            "sostenibilita": 0,
+            "risparmio": 0.67
+        }
+    },
+    "timestamp":1528806484751,
+    "lastPlayed":1528806484751
+}
