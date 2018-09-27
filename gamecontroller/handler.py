@@ -11,10 +11,8 @@ import boto3
 from playoff import Playoff, PlayoffException
 
 from .mapping import Mapping
-from .dynamo_models import User, Token
+from .dynamo_models import User, UserReady, Token
 
-CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID')
-CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET')
 HOSTNAME = os.environ.get('PLAYOFF_HOSTNAME')
 # Utils
 
@@ -31,7 +29,15 @@ def playoff_error_response(message):
     return {"statusCode": 500, "body": {"message": message}}
 
 
-def get_playoff_client():
+def get_playoff_client(state='PUBLISHED'):
+    print("Client Playoff creation!!")
+    if state == 'READY':
+        CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_READY')
+        CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_READY')
+    else:
+        CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_PUBLISHED')
+        CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_PUBLISHED')
+
     return Playoff(
         hostname=HOSTNAME,
         client_id=CLIENT_ID,
@@ -44,8 +50,19 @@ def get_playoff_client():
 
 
 def get_user_status(event, context, player, playoff_client):
-
-    result = playoff_client.get(route=f"/admin/players/{player}")
+    print("Connecting to Playoff")
+    state_ = "PUBLISHED"
+    if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
+        state_ = event["queryStringParameters"]["state"]
+    try:
+        result = playoff_client.get(route=f"/admin/players/{player}")
+    except PlayoffException as err:
+        print(err)
+        if err.name == 'player_not_found':
+            return playoff_player_not_found_error_response(err.message)
+        else:
+            return playoff_error_response(err.message)
+    print(result)
     result_ranking = playoff_client.get(
         route="/runtime/leaderboards/progressione_personale",
         query={
@@ -59,21 +76,30 @@ def get_user_status(event, context, player, playoff_client):
     # get_weeks is the only action of Mapping that would require aws, so I leave it here
     ranking = (result_ranking['data'][0]['rank'] / result_ranking['total'] * 100) / 100
 
-    weeks = get_weeks(player)
-    date_last_play = User.get(player).date_last_play_timestamp_format
+    weeks = get_weeks(player, state_)
+    if state_ == 'READY':
+        date_last_play = UserReady.get(player).date_last_play_timestamp_format
+    else:
+        date_last_play = User.get(player).date_last_play_timestamp_format
 
     return Mapping(result, weeks, ranking=ranking, date_last_play=date_last_play).json
 
 
-def get_weeks(player):
-
-    try:
-        user_player = User.get(player)
-        weeks = user_player.unblocked_weeks
-    except User.DoesNotExist:
-        User(player).save()
-        weeks = 1
-
+def get_weeks(player, state="PUBLISHED"):
+    if state == "READY":
+        try:
+            user_player = UserReady.get(player)
+            weeks = user_player.unblocked_weeks
+        except UserReady.DoesNotExist:
+            UserReady(player).save()
+            weeks = 1
+    else:
+        try:
+            user_player = User.get(player)
+            weeks = user_player.unblocked_weeks
+        except User.DoesNotExist:
+            User(player).save()
+            weeks = 1
     return weeks
 
 
@@ -107,7 +133,11 @@ def generate_policy(ip, effect, resource):
 def play_action(event, context):
     print(event)
     event_body = json.loads(event["body"])
-    playoff_client = get_playoff_client()
+    state_ = "PUBLISHED"
+    if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
+        state_ = event["queryStringParameters"]["state"]
+
+    playoff_client = get_playoff_client(state_)
     if "challengeid" not in event_body:
         return invalid_response("no challenge id specified")
 
@@ -125,25 +155,45 @@ def play_action(event, context):
                 "variables": choices
             }
         )
-        User.get(player).save_last_play()
+        if state_ == 'READY':
+            try:
+                UserReady.get(player).save_last_play()
+            except UserReady.DoesNotExist:
+                UserReady(player).save()
+                UserReady.get(player).save_last_play()
+        else:
+            try:
+                User.get(player).save_last_play()
+            except User.DoesNotExist:
+                User(player).save()
+                User.get(player).save_last_play()
+
     except PlayoffException as err:
+        print(err)
         if err.name == 'player_not_found':
             return playoff_player_not_found_error_response(err.message)
         else:
             return playoff_error_response(err.message)
-
-    return get_user_status(event_body, context, player, playoff_client=playoff_client)
+    return get_user_status(event, context, player, playoff_client=playoff_client)
 
 
 def user_status_action(event, context):
-    playoff_client = get_playoff_client()
+    state_ = "PUBLISHED"
+
+    if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
+        state_ = event["queryStringParameters"]["state"]
+
+    playoff_client = get_playoff_client(state_)
     player = event['pathParameters']['player']
     return get_user_status(event, context, player, playoff_client)
 
 
 def level_upgrade_action(event, context):
-
-    playoff_client = get_playoff_client()
+    event_body = json.loads(event["body"])
+    state_ = "PUBLISHED"
+    if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
+        state_ = event["queryStringParameters"]["state"]
+    playoff_client = get_playoff_client(state_)
     player = event['pathParameters']['player']
     map = {
         "casa": 'compra_casa_livello',
@@ -166,17 +216,25 @@ def get_lazy_users(event, context):
     'from' is passed as a parameter
     """
     print(event)
-    playoff_client = get_playoff_client()
+    state_ = "PUBLISHED"
+    if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
+        state_ = event["queryStringParameters"]["state"]
     from_iso = event['pathParameters']['from']
     from_date = datetime.strptime(from_iso, '%Y-%m-%d')
     users = []
-    for user in User.get_lazy_users(from_date):
+
+    if state_ == "READY":
+        temp_users = UserReady.get_lazy_users(from_date)
+    else:
+        temp_users = User.get_lazy_users(from_date)
+    for user in temp_users:
         users += [{
             'user_id': user.user_id,
             'lastPlayed': user.date_last_play_timestamp_format
         }]
 
     return users
+
 
 def auth(event, context):
     print(event)
