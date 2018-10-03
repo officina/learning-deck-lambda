@@ -70,6 +70,12 @@ package:
     - 'README.md'
     - 'package.json'
     - 'package-lock.json'
+    - '.eggs/**'
+    - '.idea/**'
+    - '.tests/**'
+    - 'testNick.py'
+    - 'schemas/**'
+    - 'scripts/**'
   include:
     - 'gamecontroller/**'
 
