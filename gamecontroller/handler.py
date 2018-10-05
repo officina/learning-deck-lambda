@@ -177,17 +177,7 @@ def play_action(event, context):
             return playoff_player_not_found_error_response(err.message)
         else:
             return playoff_error_response(err.message)
-    # return get_user_status(event, context, player, playoff_client=playoff_client)
-    result = {
-        "points": 27,
-        "params": {
-            "sicurezza": 0.37,
-            "salute": 0.74,
-            "sostenibilita": 0,
-            "risparmio": 0.51
-        }
-    }
-    return result
+    return get_user_status(event, context, player, playoff_client=playoff_client)
 
 
 def user_status_action(event, context):

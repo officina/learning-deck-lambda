@@ -1,5 +1,5 @@
 globalAuthorizer: ""
-globalEndPointType: "private"
+globalEndPointType: private
 globalVpc:
   securityGroupIds:
     - sg-029dd5f46a5b67377
