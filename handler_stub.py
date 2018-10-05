@@ -67,6 +67,10 @@ def get_lazy_users(event, context):
     }
     return response
 
+def reset_players(event, context):
+    print(event)
+    GameController.reset_players()
+
 
 def auth(event, context):
     print(event)

@@ -9,6 +9,7 @@ from jsonschema import  validate,  ValidationError
 class ApiTest(TestCase):
     # prod_endpoint = 'https://xz4740jwrg.execute-api.eu-west-1.amazonaws.com/prod/api'
     prod_endpoint = "https://cqj2wl89n9.execute-api.eu-central-1.amazonaws.com/dev/api"
+    prod_endpoint_new ="https://2zmur5pbf1.execute-api.eu-central-1.amazonaws.com/prod/api"
     # qa_endpoint = 'https://7h4zux15wi.execute-api.eu-central-1.amazonaws.com/prod/api' #fix it
     dev_endpoint = 'https://cqj2wl89n9.execute-api.eu-central-1.amazonaws.com/dev/api'
 
@@ -54,16 +55,13 @@ class ApiTest(TestCase):
         except ValidationError as error:
             self.fail(f"Schema validation failed with error:\n {error}")
 
-    def old_test_play(self):
-        with open('./data/play_input.json', 'r') as f:
+    def test_play_2(self):
+        with open('./data/play_input_new.json', 'r') as f:
             input = f.read()
 
         data = json.loads(input)
 
-        response = requests.put(
-            url=f"{self.prod_endpoint}/play/lucia",
-            json=data
-        )
+        response = requests.put(url=f"{self.prod_endpoint_new}/play/player_23?state=READY", json=data)
 
         self.assertEqual(response.status_code, 200)
 
@@ -73,6 +71,7 @@ class ApiTest(TestCase):
 
             schema = json.loads(schema_data)
             content = json.loads(response.content)
+            print(content)
             jsonschema.validate(content, schema)
         except ValidationError as error:
             self.fail(f"Schema validation failed with error:\n {error}")
