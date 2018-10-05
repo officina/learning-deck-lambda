@@ -55,6 +55,17 @@ def get_user_status(event, context, player, playoff_client):
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
     try:
+        # calcolo prima il ranking per consentire se necessaro di "attivare" il boot di player appena creati
+        result_ranking = playoff_client.get(
+            route="/runtime/leaderboards/progressione_personale",
+            query={
+                "player_id": player,
+                "cycle": "alltime",
+                "entity_id": player,
+                "radius": "0",
+                "sort": "descending",
+                "ranking": "relative"
+            })
         result = playoff_client.get(route=f"/admin/players/{player}")
     except PlayoffException as err:
         print(err)
@@ -63,16 +74,7 @@ def get_user_status(event, context, player, playoff_client):
         else:
             return playoff_error_response(err.message)
     print(result)
-    result_ranking = playoff_client.get(
-        route="/runtime/leaderboards/progressione_personale",
-        query={
-            "player_id": player,
-            "cycle": "alltime",
-            "entity_id": player,
-            "radius": "0",
-            "sort": "descending",
-            "ranking": "relative"
-        })
+
     # get_weeks is the only action of Mapping that would require aws, so I leave it here
     ranking = (result_ranking['data'][0]['rank'] / result_ranking['total'] * 100) / 100
 
@@ -234,6 +236,37 @@ def get_lazy_users(event, context):
         }]
 
     return users
+
+
+def reset_players():
+    print('Reset dei players in ready')
+    TABLE_NAME = 'users_info_ready-prod'
+
+    playoff_client = get_playoff_client('READY')
+
+    client_db = boto3.resource('dynamodb').Table(os.environ['DYNAMODB_USERS_READY_INFO_TABLE'])
+
+    while True:
+        response = playoff_client.get(route='/admin/players')
+        if len(response['data']) == 0:
+            break;
+        print(response['data'])
+        for player in response['data']:
+            player_target = player['id']
+            playoff_client.delete(route=f'/admin/players/{player_target}')
+            key = dict()
+            key["user_id"] = player_target
+            client_db.delete_item(Key=key)
+            print(f'player {player_target} deleted')
+
+    #ricreo il nuovo set di players
+    for i in range(1, 30):
+        player = f'player_{i}'
+        response = playoff_client.post(route='/admin/players', body={'id': player, 'alias': player})
+        item = {
+            "user_id": player
+        }
+        print("Player creato: " + player)
 
 
 def auth(event, context):

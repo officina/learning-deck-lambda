@@ -6,11 +6,11 @@ print("INIZIO")
 print("*************************")
 
 # client_id che consente di accedere a Playoff
-CLIENT_ID = 'MzM1ODg2OGYtYzkzNy00ZTUwLTlkZjktYjZmMzY3NDc2ZmFj'
+CLIENT_ID = 'MmRiNDUxN2ItZGJkNi00ZWQ1LWIyYWUtNmY4MDM0OGVjZDhm'
 # secret_id che consente di accedere a Playoff
-CLIENT_SECRET = 'YjIzNmEzY2UtMDc5Yi00ZDE3LTlhNzQtMWM0ZjRkZWM0ZmNiODA0ZGMxYTAtYWMyZi0xMWU4LWIwYmItOWRiOWY3N2UxMTYz'
+CLIENT_SECRET = 'MDRhMDIyMjQtMWMwMi00M2FjLWJhM2YtNTNiMDkwNzllMmMxMjFkYmUxYjAtYmMxYS0xMWU4LWEwNDYtNDczYzAwYjQwN2Q4'
 # hostname playoff
-HOSTNAME = 'playoff.cc'
+HOSTNAME = 'playoffgenerali.it'
 # profilo AWS (in credentials) che consente di accedere alla tablla dynamo
 AWS_PROFILE = 'mygenerali-prod'
 # tabella dynamo da ripulire
@@ -28,10 +28,10 @@ playoff_client = Playoff(
 dynamo_db = boto3.session.Session(profile_name=AWS_PROFILE).resource('dynamodb', region_name='eu-central-1')
 client_db = dynamo_db.Table(TABLE_NAME)
 
-# for i in range(1, 130):
-#     player = f'player_test_{i}'
+# for i in range(1, 30):
+#     player = f'player_{i}'
 #     print("creazione player " + player)
-#     playoff_client.post(route='/admin/players', body={'id': player, 'alias': player})
+#     response = playoff_client.post(route='/admin/players', body={'id': player, 'alias': player})
 #     item = {
 #         "user_id": player
 #     }

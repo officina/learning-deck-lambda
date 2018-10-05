@@ -58,14 +58,6 @@ class UserReady(User):
         table_name = USERS_READY_TABLE_NAME
         region = REGION
 
-    # @property
-    # def date_last_play_timestamp_format(self):
-    #     return super(User, self).date_last_play_timestamp_format
-    #
-    # @property
-    # def unblocked_weeks(self):
-    #     return super(User, self).unblocked_weeks
-
 
 class Token(Model):
 
