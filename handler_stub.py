@@ -20,30 +20,30 @@ def user_status_action(event, context):
 def play_action(event, context):
     result = GameController.play_action(event, context)
 
-    # print(result)
+    print(result)
 
-    response_temp = {
-        "points": 27,
-        "params":
-            {
-                "sicurezza": 0.37,
-                "salute": 0.74,
-                "sostenibilita": 0,
-                "risparmio": 0.51
-            }
-    }
-    # attenzione deve ritonrare response, il temp  momentaneamente per una response statica
-    response = {
-        'statusCode': '200',
-        'body': json.dumps(response_temp)
-    }
-
-    # response = {
-    #     'statusCode': result['statusCode'],
-    #     'body': json.dumps(result['body'])
+    # response_temp = {
+    #     "points": 27,
+    #     "params":
+    #         {
+    #             "sicurezza": 0.37,
+    #             "salute": 0.74,
+    #             "sostenibilita": 0,
+    #             "risparmio": 0.51
+    #         }
     # }
-    #
-    # print(response)
+    # attenzione deve ritonrare response, il temp  momentaneamente per una response statica
+    # response = {
+    #     'statusCode': '200',
+    #     'body': json.dumps(response_temp)
+    # }
+
+    response = {
+        'statusCode': result['statusCode'],
+        'body': json.dumps(result['body'])
+    }
+
+    print(response)
 
     return response
 

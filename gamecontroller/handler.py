@@ -73,7 +73,6 @@ def get_user_status(event, context, player, playoff_client):
             return playoff_player_not_found_error_response(err.message)
         else:
             return playoff_error_response(err.message)
-    print(result)
 
     # get_weeks is the only action of Mapping that would require aws, so I leave it here
     ranking = (result_ranking['data'][0]['rank'] / result_ranking['total'] * 100) / 100
@@ -157,6 +156,15 @@ def play_action(event, context):
                 "variables": choices
             }
         )
+        dynamic_points = 0
+
+        for obj in result_post['events']['local'][0]['changes']:
+            print(obj)
+            if obj["metric"]["id"] == 'punti':
+                print("punti")
+                old_val = int(obj["delta"]["old"])
+                new_val = int(obj["delta"]["new"])
+                dynamic_points = new_val - old_val
 
         if state_ == 'READY':
             try:
@@ -177,7 +185,18 @@ def play_action(event, context):
             return playoff_player_not_found_error_response(err.message)
         else:
             return playoff_error_response(err.message)
-    return get_user_status(event, context, player, playoff_client=playoff_client)
+    result = get_user_status(event, context, player, playoff_client=playoff_client)
+
+    new_result_body = {
+        "points": dynamic_points,
+        "params": result["body"]["progress"]["params"]
+    }
+
+    new_result = dict()
+    new_result["statusCode"] = 200
+    new_result["body"] = new_result_body
+    print(new_result)
+    return new_result
 
 
 def user_status_action(event, context):

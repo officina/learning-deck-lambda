@@ -91,7 +91,7 @@
       ]
    },
    "pathParameters":{
-      "player":"lucia"
+      "player":"player_1"
    },
    "stageVariables":"",
    "requestContext":{
@@ -103,7 +103,7 @@
       "httpMethod":"PUT",
       "extendedRequestId":"My35VGezliAFZ5Q=",
       "requestTime":"06/Sep/2018:10:51:14 +0000",
-      "path":"/dev/api/play/lucia",
+      "path":"/dev/api/play/player_1",
       "accountId":"123820204514",
       "protocol":"HTTP/1.1",
       "stage":"dev",
@@ -124,6 +124,6 @@
       },
       "apiId":"3hicu2ztti"
    },
-   "body":"{\"challengeid\": \"S03_C02_CH00001\", \"choices\": [ {\"q\":\"S03_C02_CH00001_Q00001\",\"a\":\"1\"}, {\"q\":\"S03_C02_CH00001_Q00002\",\"a\":\"1\"}, {\"q\":\"S03_C02_CH00001_Q00003\",\"a\":\"2\"}, {\"q\":\"S03_C02_CH00001_Q00004\",\"a\":\"2\"}, {\"q\":\"S03_C02_CH00001_Q00005\",\"a\":\"1\"}]}",
+   "body":"{\"challengeid\": \"S05_C03_CH00006\", \"choices\": [ {\"q\":\"S05_C03_CH00006_Q00014\",\"a\":\"1\"}, {\"q\":\"S05_C03_CH00006_Q00015\",\"a\":\"1\"}, {\"q\":\"S05_C03_CH00006_Q00016\",\"a\":\"2\"}]}",
     "isBase64Encoded":false
 }
