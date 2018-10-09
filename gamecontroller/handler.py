@@ -30,7 +30,7 @@ def playoff_error_response(message):
 
 
 def get_playoff_client(state='PUBLISHED'):
-    print("Client Playoff creation!!")
+    print("Client Playoff creation with ref-time " + str(datetime.now()))
     if state == 'READY':
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_READY')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_READY')
@@ -38,7 +38,7 @@ def get_playoff_client(state='PUBLISHED'):
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_PUBLISHED')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_PUBLISHED')
 
-    return Playoff(
+    client = Playoff(
         hostname=HOSTNAME,
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
@@ -47,10 +47,12 @@ def get_playoff_client(state='PUBLISHED'):
         store=lambda token: Token.set_token_dynamo(token),
         load=lambda: Token.get_token_dynamo(),
     )
+    print("Creation OK with ref-time " + str(datetime.now()))
+    return client
 
 
 def get_user_status(event, context, player, playoff_client):
-    print("Connecting to Playoff")
+    print("Get user status - START")
     state_ = "PUBLISHED"
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
@@ -75,14 +77,15 @@ def get_user_status(event, context, player, playoff_client):
             return playoff_error_response(err.message)
 
     # get_weeks is the only action of Mapping that would require aws, so I leave it here
+    print("RANKING CALCULATION")
     ranking = (result_ranking['data'][0]['rank'] / result_ranking['total'] * 100) / 100
-
+    print("WEEKS CALCULATION")
     weeks = get_weeks(player, state_)
     if state_ == 'READY':
         date_last_play = UserReady.get(player).date_last_play_timestamp_format
     else:
         date_last_play = User.get(player).date_last_play_timestamp_format
-
+    print("MAPPING START")
     return Mapping(result, weeks, ranking=ranking, date_last_play=date_last_play).json
 
 
@@ -138,7 +141,10 @@ def play_action(event, context):
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
 
+    print("PLAY ACTION: before get_playoff_client")
     playoff_client = get_playoff_client(state_)
+    print("PLAY ACTION: after get_playoff_client")
+
     if "challengeid" not in event_body:
         return invalid_response("no challenge id specified")
 
@@ -149,6 +155,7 @@ def play_action(event, context):
     player = event['pathParameters']['player']
 
     try:
+        print("Before post - play_action")
         result_post = playoff_client.post(
             route=f"/runtime/actions/{event_body['challengeid']}/play",
             query={"player_id": player},
@@ -156,15 +163,20 @@ def play_action(event, context):
                 "variables": choices
             }
         )
+        print("******************")
+        print("RESULT POST")
+        print(result_post)
+        print("******************")
         dynamic_points = 0
 
         for obj in result_post['events']['local'][0]['changes']:
-            print(obj)
             if obj["metric"]["id"] == 'punti':
-                print("punti")
                 old_val = int(obj["delta"]["old"])
                 new_val = int(obj["delta"]["new"])
-                dynamic_points = new_val - old_val
+                dynamic_points = dynamic_points + (new_val - old_val)
+                print("Points parziale guadagnato: " + str(new_val - old_val))
+
+        print("Points guadagnati: " + str(dynamic_points))
 
         if state_ == 'READY':
             try:
@@ -195,7 +207,6 @@ def play_action(event, context):
     new_result = dict()
     new_result["statusCode"] = 200
     new_result["body"] = new_result_body
-    print(new_result)
     return new_result
 
 

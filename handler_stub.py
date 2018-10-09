@@ -20,8 +20,6 @@ def user_status_action(event, context):
 def play_action(event, context):
     result = GameController.play_action(event, context)
 
-    print(result)
-
     # response_temp = {
     #     "points": 27,
     #     "params":
