@@ -85,6 +85,7 @@ functions:
 
   play_action:
     handler: handler_stub.play_action
+    timeout: 30
     events:
       - http:
           path: api/play/{player}
@@ -93,6 +94,7 @@ functions:
           authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
   get_user_status:
     handler: handler_stub.user_status_action
+    timeout: 30
     events:
       - http:
           path: api/userstatus/{player}
@@ -101,6 +103,7 @@ functions:
           authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
   level_upgrade:
     handler: handler_stub.level_upgrade
+    timeout: 30
     events:
       - http:
           path: api/levelupgrade/{player}
@@ -108,6 +111,7 @@ functions:
           cors: true
   get_lazy_users:
     handler: handler_stub.get_lazy_users
+    timeout: 30
     events:
       - http:
           path: api/lazyusers/{from}
