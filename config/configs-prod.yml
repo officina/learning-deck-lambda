@@ -19,8 +19,8 @@ additionalResources:
         - AttributeName: token
           KeyType: HASH
       ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
+        ReadCapacityUnits: 20
+        WriteCapacityUnits: 2
   usersInfoTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Delete
@@ -33,8 +33,8 @@ additionalResources:
         - AttributeName: user_id
           KeyType: HASH
       ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
+        ReadCapacityUnits: 20
+        WriteCapacityUnits: 2
   usersReadyInfoTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Delete
@@ -47,5 +47,33 @@ additionalResources:
         - AttributeName: user_id
           KeyType: HASH
       ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
+        ReadCapacityUnits: 20
+        WriteCapacityUnits: 2
+customCapacities:
+  - table: tokenTable
+    read:
+      minimum: 20
+      maximum: 50
+      usage: 0.75
+    write:
+      minimum: 5
+      maximum: 20
+      usage: 0.75
+  - table: usersInfoTable
+    read:
+      minimum: 5
+      maximum: 50
+      usage: 0.75
+    write:
+      minimum: 5
+      maximum: 20
+      usage: 0.75
+  - table: usersReadyInfoTable
+    read:
+      minimum: 5
+      maximum: 50
+      usage: 0.75
+    write:
+      minimum: 5
+      maximum: 20
+      usage: 0.75

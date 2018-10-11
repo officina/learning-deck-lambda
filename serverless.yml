@@ -130,6 +130,8 @@ resources:
   Resources:
     ${file(config/configs-${opt:stage, self:provider.stage}.yml):additionalResources}
 custom:
+  capacities:
+    ${file(config/configs-${opt:stage, self:provider.stage}.yml):customCapacities}
   authorizer:
     users:
       name: authorizerUser
@@ -144,3 +146,4 @@ custom:
 plugins:
   - serverless-python-requirements
   - serverless-prune-plugin
+  - serverless-dynamodb-autoscaling

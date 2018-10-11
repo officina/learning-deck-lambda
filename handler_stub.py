@@ -1,10 +1,5 @@
 import json
-from playoff import Playoff, PlayoffException
-import json
-import time
-import os
 from gamecontroller import handler as GameController
-import simplejson as sjson
 
 
 def user_status_action(event, context):
