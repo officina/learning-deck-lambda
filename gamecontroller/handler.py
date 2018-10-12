@@ -1,11 +1,8 @@
 # coding: utf-8
 
-import os
 import json
-import time
 from datetime import datetime
 import os
-from .mapping import Mapping
 import boto3
 
 from playoff import Playoff, PlayoffException
@@ -43,7 +40,6 @@ def get_playoff_client(state='PUBLISHED'):
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         type="client",
-        allow_unsecure=True,
         store=lambda token: Token.set_token_dynamo(token),
         load=lambda: Token.get_token_dynamo(),
     )

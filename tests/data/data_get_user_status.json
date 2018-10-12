@@ -87,7 +87,7 @@
       ]
    },
    "pathParameters":{
-      "player":"lucia2"
+      "player":"player_1"
    },
    "stageVariables":"",
    "requestContext":{
@@ -96,7 +96,7 @@
       "httpMethod":"GET",
       "extendedRequestId":"NhZpkHHDliAFiKg=",
       "requestTime":"20/Sep/2018:13:39:22 +0000",
-      "path":"/dev/api/userstatus/lucia",
+      "path":"/dev/api/userstatus/player_1",
       "accountId":"123820204514",
       "protocol":"HTTP/1.1",
       "stage":"dev",

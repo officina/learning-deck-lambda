@@ -73,14 +73,18 @@ class Token(Model):
 
     @classmethod
     def set_token_dynamo(cls, token):
+        print("set_token_dynamo START")
+        print(token)
         cls(
             TOKEN_TABLE_NAME,
             access_token=token['access_token'],
             token_type=token['token_type'],
             expires_at=str(token['expires_at'])
         ).save()
+        print("set_token_dynamo END")
 
     @classmethod
     def get_token_dynamo(cls):
+        print("LAMBDA - get_token_dynamo START")
         tk = list(cls.scan(cls.token == TOKEN_TABLE_NAME))[0]
         return tk and tk.attribute_values or None

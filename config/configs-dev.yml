@@ -1,4 +1,3 @@
-#globalAuthorizer: ${self:custom.authorizer.users}
 globalAuthorizer: ""
 globalEndPointType: ""
 globalVpc: ""
@@ -59,3 +58,31 @@ additionalResources:
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
+customCapacities:
+  - table: tokenTable
+    read:
+      minimum: 1
+      maximum: 1
+      usage: 0.75
+    write:
+      minimum: 1
+      maximum: 1
+      usage: 0.75
+  - table: usersInfoTable
+    read:
+      minimum: 1
+      maximum: 1
+      usage: 0.75
+    write:
+      minimum: 1
+      maximum: 1
+      usage: 0.75
+  - table: usersReadyInfoTable
+    read:
+      minimum: 1
+      maximum: 1
+      usage: 0.75
+    write:
+      minimum: 1
+      maximum: 1
+      usage: 0.75
