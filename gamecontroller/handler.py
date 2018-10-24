@@ -233,8 +233,15 @@ def level_upgrade_action(event, context):
     data = json.loads(event["body"])
     key = f'{map[data["id"]]}_{data["newLevel"]}'
     end_point = f'/runtime/actions/{key}/play'
+    try:
+        result_post = playoff_client.post(end_point, query={"player_id": player},)
+    except PlayoffException as err:
+        print(err)
+        if err.name == 'player_not_found':
+            return playoff_player_not_found_error_response(err.message)
+        else:
+            return playoff_error_response(err.message)
 
-    result_post = playoff_client.post(end_point, query={"player_id": player},)
     # per ora consideriamo non necessario l'aggiornamento della data eseguendo un level upgrade
     # User.get(player).save_last_play()
     return get_user_status(event, context, player, playoff_client)
