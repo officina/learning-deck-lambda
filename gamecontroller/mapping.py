@@ -121,7 +121,8 @@ class Mapping:
                         info = {k: int(v) for k, v in m.groupdict().items()}
                         prefix = 'S{story_id:02}_C{ch_id:02}'.format(**info)
                         for j, challenge in enumerate(score['value']):
-                            challenges += [f'{prefix}_CH{j+1:05}']
+                            # challenges += [f'{prefix}_CH{j+1:05}']
+                            challenges += [challenge['name']]
 
         return {
             "available": weeks,

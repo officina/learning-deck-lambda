@@ -86,5 +86,9 @@ class Token(Model):
     @classmethod
     def get_token_dynamo(cls):
         print("LAMBDA - get_token_dynamo START")
-        tk = list(cls.scan(cls.token == TOKEN_TABLE_NAME))[0]
-        return tk and tk.attribute_values or None
+        try:
+            tk = list(cls.scan(cls.token == TOKEN_TABLE_NAME))[0]
+            print("LAMBDA - get_token_dynamo FINISHED")
+            return tk and tk.attribute_values or None
+        except:
+            return None
