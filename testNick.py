@@ -13,6 +13,38 @@ key["user_id"] = 'lucia'
 
 # response_result = dynamo_db.Table('users_info_ready-dev').get_item(Key=key)
 
-existing_tables = dynamo_db_client.list_tables()['TableNames']
-print(existing_tables)
+
+# client_id che consente di accedere a Playoff
+CLIENT_ID = 'MmRiNDUxN2ItZGJkNi00ZWQ1LWIyYWUtNmY4MDM0OGVjZDhm'
+# secret_id che consente di accedere a Playoff
+CLIENT_SECRET = 'MDRhMDIyMjQtMWMwMi00M2FjLWJhM2YtNTNiMDkwNzllMmMxMjFkYmUxYjAtYmMxYS0xMWU4LWEwNDYtNDczYzAwYjQwN2Q4'
+# hostname playoff
+HOSTNAME = 'playoffgenerali.it'
+# profilo AWS (in credentials) che consente di accedere alla tablla dynamo
+AWS_PROFILE = 'mygenerali-prod'
+# tabella dynamo da ripulire
+TABLE_NAME = 'users_info_ready-prod'
+
+playoff_client = Playoff(
+    hostname=HOSTNAME,
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET,
+    type="client",
+    allow_unsecure=True
+)
+
+player = 'lucia22'
+
+response = playoff_client.get(
+        route="/runtime/leaderboards/progressione_personale",
+        query={
+            "player_id": player,
+            "cycle": "alltime",
+            "entity_id": player,
+            "radius": "0",
+            "sort": "descending",
+            "ranking": "relative"
+        })
+
+print(response)
 

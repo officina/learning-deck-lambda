@@ -1,24 +1,24 @@
 {
-  "challengeid": "storia01_capitolo01_sfida01",
+  "challengeid": "S03_C02_CH00002",
   "choices": [
     {
-      "q": "domanda01",
+      "q": "S03_C02_CH00002_Q00006",
       "a": "1"
     },
     {
-      "q": "domanda02",
+      "q": "S03_C02_CH00002_Q00007",
       "a": "1"
     },
     {
-      "q": "domanda03",
+      "q": "S03_C02_CH00002_Q00008",
       "a": "2"
     },
     {
-      "q": "domanda04",
+      "q": "S03_C02_CH00002_Q00009",
       "a": "2"
     },
     {
-      "q": "domanda05",
+      "q": "S03_C02_CH00002_Q00010",
       "a": "1"
     }
   ]

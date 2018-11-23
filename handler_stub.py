@@ -1,10 +1,5 @@
 import json
-from playoff import Playoff, PlayoffException
-import json
-import time
-import os
 from gamecontroller import handler as GameController
-import simplejson as sjson
 
 
 def user_status_action(event, context):
@@ -19,8 +14,6 @@ def user_status_action(event, context):
 
 def play_action(event, context):
     result = GameController.play_action(event, context)
-
-    print(result)
 
     # response_temp = {
     #     "points": 27,
@@ -66,6 +59,10 @@ def get_lazy_users(event, context):
         'body': json.dumps(result)
     }
     return response
+
+def reset_players(event, context):
+    print(event)
+    GameController.reset_players()
 
 
 def auth(event, context):

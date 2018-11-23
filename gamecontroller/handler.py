@@ -1,11 +1,8 @@
 # coding: utf-8
 
-import os
 import json
-import time
 from datetime import datetime
 import os
-from .mapping import Mapping
 import boto3
 
 from playoff import Playoff, PlayoffException
@@ -30,7 +27,7 @@ def playoff_error_response(message):
 
 
 def get_playoff_client(state='PUBLISHED'):
-    print("Client Playoff creation!!")
+    print("Client Playoff creation with ref-time " + str(datetime.now()))
     if state == 'READY':
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_READY')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_READY')
@@ -38,23 +35,35 @@ def get_playoff_client(state='PUBLISHED'):
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_PUBLISHED')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_PUBLISHED')
 
-    return Playoff(
+    client = Playoff(
         hostname=HOSTNAME,
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         type="client",
-        allow_unsecure=True,
         store=lambda token: Token.set_token_dynamo(token),
         load=lambda: Token.get_token_dynamo(),
     )
+    print("Creation OK with ref-time " + str(datetime.now()))
+    return client
 
 
 def get_user_status(event, context, player, playoff_client):
-    print("Connecting to Playoff")
+    print("Get user status - START")
     state_ = "PUBLISHED"
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
     try:
+        # calcolo prima il ranking per consentire se necessaro di "attivare" il boot di player appena creati
+        result_ranking = playoff_client.get(
+            route="/runtime/leaderboards/progressione_personale",
+            query={
+                "player_id": player,
+                "cycle": "alltime",
+                "entity_id": player,
+                "radius": "0",
+                "sort": "descending",
+                "ranking": "relative"
+            })
         result = playoff_client.get(route=f"/admin/players/{player}")
     except PlayoffException as err:
         print(err)
@@ -62,26 +71,17 @@ def get_user_status(event, context, player, playoff_client):
             return playoff_player_not_found_error_response(err.message)
         else:
             return playoff_error_response(err.message)
-    print(result)
-    result_ranking = playoff_client.get(
-        route="/runtime/leaderboards/progressione_personale",
-        query={
-            "player_id": player,
-            "cycle": "alltime",
-            "entity_id": player,
-            "radius": "0",
-            "sort": "descending",
-            "ranking": "relative"
-        })
-    # get_weeks is the only action of Mapping that would require aws, so I leave it here
-    ranking = (result_ranking['data'][0]['rank'] / result_ranking['total'] * 100) / 100
 
+    # get_weeks is the only action of Mapping that would require aws, so I leave it here
+    print("RANKING CALCULATION")
+    ranking = (result_ranking['data'][0]['rank'] / result_ranking['total'] * 100) / 100
+    print("WEEKS CALCULATION")
     weeks = get_weeks(player, state_)
     if state_ == 'READY':
         date_last_play = UserReady.get(player).date_last_play_timestamp_format
     else:
         date_last_play = User.get(player).date_last_play_timestamp_format
-
+    print("MAPPING START")
     return Mapping(result, weeks, ranking=ranking, date_last_play=date_last_play).json
 
 
@@ -137,7 +137,10 @@ def play_action(event, context):
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
 
+    print("PLAY ACTION: before get_playoff_client")
     playoff_client = get_playoff_client(state_)
+    print("PLAY ACTION: after get_playoff_client")
+
     if "challengeid" not in event_body:
         return invalid_response("no challenge id specified")
 
@@ -148,6 +151,7 @@ def play_action(event, context):
     player = event['pathParameters']['player']
 
     try:
+        print("Before post - play_action")
         result_post = playoff_client.post(
             route=f"/runtime/actions/{event_body['challengeid']}/play",
             query={"player_id": player},
@@ -155,6 +159,21 @@ def play_action(event, context):
                 "variables": choices
             }
         )
+        print("******************")
+        print("RESULT POST")
+        print(result_post)
+        print("******************")
+        dynamic_points = 0
+
+        for obj in result_post['events']['local'][0]['changes']:
+            if obj["metric"]["id"] == 'punti':
+                old_val = int(obj["delta"]["old"])
+                new_val = int(obj["delta"]["new"])
+                dynamic_points = dynamic_points + (new_val - old_val)
+                print("Points parziale guadagnato: " + str(new_val - old_val))
+
+        print("Points guadagnati: " + str(dynamic_points))
+
         if state_ == 'READY':
             try:
                 UserReady.get(player).save_last_play()
@@ -174,7 +193,17 @@ def play_action(event, context):
             return playoff_player_not_found_error_response(err.message)
         else:
             return playoff_error_response(err.message)
-    return get_user_status(event, context, player, playoff_client=playoff_client)
+    result = get_user_status(event, context, player, playoff_client=playoff_client)
+
+    new_result_body = {
+        "points": dynamic_points,
+        "params": result["body"]["progress"]["params"]
+    }
+
+    new_result = dict()
+    new_result["statusCode"] = 200
+    new_result["body"] = new_result_body
+    return new_result
 
 
 def user_status_action(event, context):
@@ -204,8 +233,15 @@ def level_upgrade_action(event, context):
     data = json.loads(event["body"])
     key = f'{map[data["id"]]}_{data["newLevel"]}'
     end_point = f'/runtime/actions/{key}/play'
+    try:
+        result_post = playoff_client.post(end_point, query={"player_id": player},)
+    except PlayoffException as err:
+        print(err)
+        if err.name == 'player_not_found':
+            return playoff_player_not_found_error_response(err.message)
+        else:
+            return playoff_error_response(err.message)
 
-    result_post = playoff_client.post(end_point, query={"player_id": player},)
     # per ora consideriamo non necessario l'aggiornamento della data eseguendo un level upgrade
     # User.get(player).save_last_play()
     return get_user_status(event, context, player, playoff_client)
@@ -234,6 +270,37 @@ def get_lazy_users(event, context):
         }]
 
     return users
+
+
+def reset_players():
+    print('Reset dei players in ready')
+    TABLE_NAME = 'users_info_ready-prod'
+
+    playoff_client = get_playoff_client('READY')
+
+    client_db = boto3.resource('dynamodb').Table(os.environ['DYNAMODB_USERS_READY_INFO_TABLE'])
+
+    while True:
+        response = playoff_client.get(route='/admin/players')
+        if len(response['data']) == 0:
+            break;
+        print(response['data'])
+        for player in response['data']:
+            player_target = player['id']
+            playoff_client.delete(route=f'/admin/players/{player_target}')
+            key = dict()
+            key["user_id"] = player_target
+            client_db.delete_item(Key=key)
+            print(f'player {player_target} deleted')
+
+    #ricreo il nuovo set di players
+    for i in range(1, 30):
+        player = f'player_{i}'
+        response = playoff_client.post(route='/admin/players', body={'id': player, 'alias': player})
+        item = {
+            "user_id": player
+        }
+        print("Player creato: " + player)
 
 
 def auth(event, context):

@@ -82,10 +82,16 @@
          "https"
       ]
    },
-   "queryStringParameters":"",
-   "multiValueQueryStringParameters":"",
+   "queryStringParameters": {
+      "state":"READY"
+   },
+   "multiValueQueryStringParameters":{
+      "state":[
+         "READY"
+      ]
+   },
    "pathParameters":{
-      "player":"lucia"
+      "player":"player_1"
    },
    "stageVariables":"",
    "requestContext":{
@@ -97,7 +103,7 @@
       "httpMethod":"PUT",
       "extendedRequestId":"My35VGezliAFZ5Q=",
       "requestTime":"06/Sep/2018:10:51:14 +0000",
-      "path":"/dev/api/play/lucia",
+      "path":"/dev/api/play/player_1",
       "accountId":"123820204514",
       "protocol":"HTTP/1.1",
       "stage":"dev",
@@ -118,6 +124,6 @@
       },
       "apiId":"3hicu2ztti"
    },
-   "body":"{\"challengeid\":\"storia01_capitolo01_sfida01\",\"choices\":[{\"q\":\"domanda01\",\"a\":\"1\"},{\"q\":\"domanda02\",\"a\":\"1\"},{\"q\":\"domanda03\",\"a\":\"2\"},{\"q\":\"domanda04\",\"a\":\"2\"},{\"q\":\"domanda05\",\"a\":\"1\"}]}",
+   "body":"{\"challengeid\": \"S05_C03_CH00006\", \"choices\": [ {\"q\":\"S05_C03_CH00006_Q00014\",\"a\":\"1\"}, {\"q\":\"S05_C03_CH00006_Q00015\",\"a\":\"1\"}, {\"q\":\"S05_C03_CH00006_Q00016\",\"a\":\"2\"}]}",
     "isBase64Encoded":false
 }

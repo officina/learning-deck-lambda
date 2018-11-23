@@ -58,14 +58,6 @@ class UserReady(User):
         table_name = USERS_READY_TABLE_NAME
         region = REGION
 
-    # @property
-    # def date_last_play_timestamp_format(self):
-    #     return super(User, self).date_last_play_timestamp_format
-    #
-    # @property
-    # def unblocked_weeks(self):
-    #     return super(User, self).unblocked_weeks
-
 
 class Token(Model):
 
@@ -81,14 +73,22 @@ class Token(Model):
 
     @classmethod
     def set_token_dynamo(cls, token):
+        print("set_token_dynamo START")
+        print(token)
         cls(
             TOKEN_TABLE_NAME,
             access_token=token['access_token'],
             token_type=token['token_type'],
             expires_at=str(token['expires_at'])
         ).save()
+        print("set_token_dynamo END")
 
     @classmethod
     def get_token_dynamo(cls):
-        tk = list(cls.scan(cls.token == TOKEN_TABLE_NAME))[0]
-        return tk and tk.attribute_values or None
+        print("LAMBDA - get_token_dynamo START")
+        try:
+            tk = list(cls.scan(cls.token == TOKEN_TABLE_NAME))[0]
+            print("LAMBDA - get_token_dynamo FINISHED")
+            return tk and tk.attribute_values or None
+        except:
+            return None
