@@ -72,11 +72,11 @@ class Token(Model):
     expires_at = attributes.UnicodeAttribute()
 
     @classmethod
-    def set_token_dynamo(cls, token):
-        print("set_token_dynamo START")
+    def set_token_dynamo(cls, token, po_state):
+        print(f"set_token_dynamo START with state {po_state}")
         print(token)
         cls(
-            TOKEN_TABLE_NAME,
+            f"{TOKEN_TABLE_NAME}_{po_state}",
             access_token=token['access_token'],
             token_type=token['token_type'],
             expires_at=str(token['expires_at'])
@@ -84,10 +84,10 @@ class Token(Model):
         print("set_token_dynamo END")
 
     @classmethod
-    def get_token_dynamo(cls):
-        print("LAMBDA - get_token_dynamo START")
+    def get_token_dynamo(cls, po_state):
+        print(f"LAMBDA - get_token_dynamo START with state {po_state}")
         try:
-            tk = list(cls.scan(cls.token == TOKEN_TABLE_NAME))[0]
+            tk = list(cls.scan(cls.token == f"{TOKEN_TABLE_NAME}_{po_state}"))[0]
             print("LAMBDA - get_token_dynamo FINISHED")
             return tk and tk.attribute_values or None
         except:

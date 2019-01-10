@@ -51,11 +51,11 @@
       ]
    },
    "queryStringParameters":{
-      "state":"READY"
+      "state":"READY2"
    },
    "multiValueQueryStringParameters":{
       "state":[
-         "READY"
+         "READY2"
       ]
    },
    "pathParameters":{
