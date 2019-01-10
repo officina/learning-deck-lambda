@@ -89,16 +89,31 @@ class Playoff:
     req.get_method = lambda: method.upper()
     response = ''
     try:
-      response = urllib.request.urlopen(req)
+      print("Sending request ...")
+      try:
+          response = urllib.request.urlopen(req, timeout=1)
+      except Exception as e:
+          print(e)
+          print("Request timout, again...")
+          response = urllib.request.urlopen(req, timeout=2)
+      print(f"Status code: {response.code}")
       if raw == True:
         raw_data = response.read()
+        print("********RAW**********")
+        print(raw_data)
+        print("**********************")
         response.close()
         return raw_data
       else:
         json_data = json.loads(response.read())
+        print("********JSON*********")
+        print(json_data)
+        print("**********************")
         response.close()
         return json_data
     except HTTPError as e:
+      print("HTTPError")
+      print(e)
       err = json.loads(e.read())
       e.close()
       if err['error'] == 'invalid_access_token':
@@ -107,9 +122,15 @@ class Playoff:
           return self.api(method, route, query, body, raw, True)
       raise PlayoffException(err['error'], err['error_description'])
     except URLError as e:
+      print("URLError")
+      print(e)
       err = json.loads(e.read())
       e.close()
       raise PlayoffException(err['error'], err['error_description'])
+    except Exception as e:
+      print(e)
+      print("Generic exception!")
+      raise PlayoffException("Playoff generic error", "Playoff generic error")
 
   def get(self, route='', query={}, raw=False):
     return self.api('GET', route, query, {}, raw)
