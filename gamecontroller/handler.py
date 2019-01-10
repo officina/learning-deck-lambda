@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 import boto3
 
-from playoff import Playoff, PlayoffException
+from .playoff import Playoff, PlayoffException
 
 from .mapping import Mapping
 from .dynamo_models import User, UserReady, Token
@@ -31,17 +31,21 @@ def get_playoff_client(state='PUBLISHED'):
     if state == 'READY':
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_READY')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_READY')
+        po_state = "ready"
     else:
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_PUBLISHED')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_PUBLISHED')
+        po_state = "published"
+
+    print(CLIENT_ID)
 
     client = Playoff(
         hostname=HOSTNAME,
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         type="client",
-        store=lambda token: Token.set_token_dynamo(token),
-        load=lambda: Token.get_token_dynamo(),
+        store=lambda token: Token.set_token_dynamo(token, po_state),
+        load=lambda: Token.get_token_dynamo(po_state),
     )
     print("Creation OK with ref-time " + str(datetime.now()))
     return client

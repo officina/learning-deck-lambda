@@ -94,7 +94,7 @@ functions:
           authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
   get_user_status:
     handler: handler_stub.user_status_action
-    timeout: 30
+    timeout: 8
     events:
       - http:
           path: api/userstatus/{player}
@@ -118,14 +118,14 @@ functions:
           method: get
           cors: true
           authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
-  reset_players:
-    handler: handler_stub.reset_players
-    timeout: 300
-    events:
-      - schedule:
-          rate: cron(0 9,13 ? * MON-FRI *)
-      - schedule:
-          rate: cron(0 15 ? * MON-THU *)
+#  reset_players:
+#    handler: handler_stub.reset_players
+#    timeout: 300
+#    events:
+#      - schedule:
+#          rate: cron(0 9,13 ? * MON-FRI *)
+#      - schedule:
+#          rate: cron(0 15 ? * MON-THU *)
 resources:
   Resources:
     ${file(config/configs-${opt:stage, self:provider.stage}.yml):additionalResources}
