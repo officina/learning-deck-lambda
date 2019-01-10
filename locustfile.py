@@ -5,7 +5,7 @@ class UserBehavior(TaskSet):
 
     @task(2)
     def with_token(self):
-        self.client.get("/prod/api/userstatus/player_1?state=READY")
+        self.client.get("/api/userstatus/player_1?state=READY")
 
     # @task(1)
     # def without_token(self):
