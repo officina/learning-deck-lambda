@@ -83,8 +83,12 @@ def get_user_status(event, context, player, playoff_client):
     weeks = get_weeks(player, state_)
     if state_ == 'READY':
         date_last_play = UserReady.get(player).date_last_play_timestamp_format
+        print("READY:")
+        print(date_last_play)
     else:
+        print("PUBLISHED:")
         date_last_play = User.get(player).date_last_play_timestamp_format
+        print(date_last_play)
     print("MAPPING START")
     return Mapping(result, weeks, ranking=ranking, date_last_play=date_last_play).json
 

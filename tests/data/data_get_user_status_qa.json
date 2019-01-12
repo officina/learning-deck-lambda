@@ -51,15 +51,15 @@
       ]
    },
    "queryStringParameters":{
-      "state":"READY2"
+      "state":"READY"
    },
    "multiValueQueryStringParameters":{
       "state":[
-         "READY2"
+         "READY"
       ]
    },
    "pathParameters":{
-      "player":"player_10"
+      "player":"player_11"
    },
    "stageVariables":"",
    "requestContext":{

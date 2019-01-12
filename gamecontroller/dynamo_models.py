@@ -42,6 +42,7 @@ class User(Model):
 
     @property
     def date_last_play_timestamp_format(self):
+        print(f"date_last_play_timestamp_format on table {USERS_TABLE_NAME} and model User")
         if self.date_last_play:
             return int(time.mktime(self.date_last_play.timetuple()))
         else:
@@ -53,10 +54,43 @@ class User(Model):
         return weeks + 1
 
 
-class UserReady(User):
+class UserReady(Model):
     class Meta:
         table_name = USERS_READY_TABLE_NAME
         region = REGION
+
+    user_id = attributes.UnicodeAttribute(hash_key=True)
+    date_start = attributes.UTCDateTimeAttribute()
+    date_last_play = attributes.UTCDateTimeAttribute(null=True)
+
+    @classmethod
+    def get_lazy_users(cls, date=None, days=None, state="PUBLISHED"):
+        date = (date or datetime.now()).astimezone(pytz.UTC)
+        if days:
+            date = date - timedelta(days=days)
+        return cls.scan(cls.date_last_play <= date)
+
+    def save(self, *args, **kwargs):
+        if not self.date_start:
+            self.date_start = datetime.now().astimezone(pytz.UTC)
+        return super().save(*args, **kwargs)
+
+    def save_last_play(self, now=None):
+        self.date_last_play = (now or datetime.now()).astimezone(pytz.UTC)
+        return self.save()
+
+    @property
+    def date_last_play_timestamp_format(self):
+        print(f"date_last_play_timestamp_format on table {USERS_READY_TABLE_NAME} and model UserReady")
+        if self.date_last_play:
+            return int(time.mktime(self.date_last_play.timetuple()))
+        else:
+            return 0
+
+    @property
+    def unblocked_weeks(self):
+        weeks = (datetime.now().astimezone(pytz.UTC) - self.date_start).days // 7
+        return weeks + 1
 
 
 class Token(Model):
