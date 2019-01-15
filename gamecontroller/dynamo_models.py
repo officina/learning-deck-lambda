@@ -52,6 +52,9 @@ class User(Model):
             last_update_in_millis = -1
         now_in_millis = int(time.mktime(datetime.now().astimezone(pytz.UTC).timetuple()))
 
+        # per la user_profile non c'è timeout, nel senso che verrà aggiornato solo da play_action o upgrade
+
+        # if not force_update and self.playoff_user_profile is not None and now_in_millis < last_update_in_millis + delta_in_millis:
         if not force_update and self.playoff_user_profile is not None and now_in_millis < last_update_in_millis + delta_in_millis:
             print("Playoff user PROFILE update not needed")
             return self

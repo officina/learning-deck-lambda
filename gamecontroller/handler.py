@@ -51,7 +51,7 @@ def get_playoff_client(state='PUBLISHED'):
     return client
 
 
-def get_user_status(event, context, player, playoff_client, force_update=False):
+def get_user_status(event, context, player, playoff_client, force_update=False, web_source=False):
     print("Get user status - START")
     state_ = "PUBLISHED"
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
@@ -59,8 +59,9 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
     try:
         if state_ == 'READY':
             try:
-                UserReady.get(player).update_playoff_user_profile(playoff_client, force_update)
-                user_info = UserReady.get(player).update_playoff_user_ranking(playoff_client, force_update)
+                if not web_source:
+                    UserReady.get(player).update_playoff_user_ranking(playoff_client, force_update)
+                user_info = UserReady.get(player).update_playoff_user_profile(playoff_client, force_update)
             except UserReady.DoesNotExist:
                 print("exception")
                 UserReady(player).save()
@@ -68,8 +69,9 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
                 user_info = UserReady.get(player).update_playoff_user_ranking(playoff_client)
         else:
             try:
-                User.get(player).update_playoff_user_profile(playoff_client, force_update)
-                user_info = User.get(player).update_playoff_user_ranking(playoff_client, force_update)
+                if not web_source:
+                    User.get(player).update_playoff_user_ranking(playoff_client, force_update)
+                user_info = User.get(player).update_playoff_user_profile(playoff_client, force_update)
             except User.DoesNotExist:
                 User(player).save()
                 User.get(player).update_playoff_user_profile(playoff_client)
@@ -85,8 +87,12 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
     ranking_info = user_info.playoff_user_ranking_dict_format
     weeks_info = user_info.unblocked_weeks
     user_profile_info = user_info.playoff_user_profile_dict_format
+    # nel caso di web_source non calcoliamo il ranking perché non è necessario
+    if web_source:
+        ranking = -1
+    else:
+        ranking = (ranking_info['data'][0]['rank'] / ranking_info['total'] * 100) / 100
 
-    ranking = (ranking_info['data'][0]['rank'] / ranking_info['total'] * 100) / 100
     date_last_play = user_info.date_last_play_timestamp_format
 
     print("MAPPING START")
