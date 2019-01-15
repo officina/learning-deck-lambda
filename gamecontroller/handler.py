@@ -57,9 +57,9 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
     web_source = False
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
-    if event["queryStringParameters"] is not None and "source" in event["queryStringParameters"]:
+    if event["queryStringParameters"] is not None and "SOURCE" in event["queryStringParameters"]:
         print("Source parameter == WEB")
-        web_source = event["queryStringParameters"]["source"] == "WEB"
+        web_source = event["queryStringParameters"]["SOURCE"] == "WEB"
     try:
         if state_ == 'READY':
             try:
