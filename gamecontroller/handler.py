@@ -51,11 +51,15 @@ def get_playoff_client(state='PUBLISHED'):
     return client
 
 
-def get_user_status(event, context, player, playoff_client, force_update=False, web_source=False):
+def get_user_status(event, context, player, playoff_client, force_update=False):
     print("Get user status - START")
     state_ = "PUBLISHED"
+    web_source = False
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
+    if event["queryStringParameters"] is not None and "source" in event["queryStringParameters"]:
+        print("Source parameter == WEB")
+        web_source = event["queryStringParameters"]["source"] == "WEB"
     try:
         if state_ == 'READY':
             try:
@@ -65,8 +69,8 @@ def get_user_status(event, context, player, playoff_client, force_update=False, 
             except UserReady.DoesNotExist:
                 print("exception")
                 UserReady(player).save()
-                UserReady.get(player).update_playoff_user_profile(playoff_client)
-                user_info = UserReady.get(player).update_playoff_user_ranking(playoff_client)
+                UserReady.get(player).update_playoff_user_ranking(playoff_client)
+                user_info = UserReady.get(player).update_playoff_user_profile(playoff_client)
         else:
             try:
                 if not web_source:
@@ -74,8 +78,8 @@ def get_user_status(event, context, player, playoff_client, force_update=False, 
                 user_info = User.get(player).update_playoff_user_profile(playoff_client, force_update)
             except User.DoesNotExist:
                 User(player).save()
-                User.get(player).update_playoff_user_profile(playoff_client)
-                user_info = User.get(player).update_playoff_user_ranking(playoff_client)
+                User.get(player).update_playoff_user_ranking(playoff_client)
+                user_info = User.get(player).update_playoff_user_profile(playoff_client)
 
     except PlayoffException as err:
         print(err)
