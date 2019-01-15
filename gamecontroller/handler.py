@@ -51,7 +51,7 @@ def get_playoff_client(state='PUBLISHED'):
     return client
 
 
-def get_user_status(event, context, player, playoff_client):
+def get_user_status(event, context, player, playoff_client, force_update=False):
     print("Get user status - START")
     state_ = "PUBLISHED"
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
@@ -59,20 +59,21 @@ def get_user_status(event, context, player, playoff_client):
     try:
         if state_ == 'READY':
             try:
+                UserReady.get(player).update_playoff_user_profile(playoff_client, force_update)
+                user_info = UserReady.get(player).update_playoff_user_ranking(playoff_client, force_update)
+            except UserReady.DoesNotExist:
+                print("exception")
+                UserReady(player).save()
                 UserReady.get(player).update_playoff_user_profile(playoff_client)
                 user_info = UserReady.get(player).update_playoff_user_ranking(playoff_client)
-            except UserReady.DoesNotExist:
-                UserReady(player).save()
-                UserReady(player).update_playoff_user_profile(playoff_client)
-                user_info = UserReady(player).update_playoff_user_ranking(playoff_client)
         else:
             try:
-                User.get(player).update_playoff_user_profile(playoff_client)
-                user_info = User.get(player).update_playoff_user_ranking(playoff_client)
+                User.get(player).update_playoff_user_profile(playoff_client, force_update)
+                user_info = User.get(player).update_playoff_user_ranking(playoff_client, force_update)
             except User.DoesNotExist:
                 User(player).save()
-                User(player).update_playoff_user_profile(playoff_client)
-                user_info = User(player).update_playoff_user_ranking(playoff_client)
+                User.get(player).update_playoff_user_profile(playoff_client)
+                user_info = User.get(player).update_playoff_user_ranking(playoff_client)
 
     except PlayoffException as err:
         print(err)
@@ -81,13 +82,11 @@ def get_user_status(event, context, player, playoff_client):
         else:
             return playoff_error_response(err.message)
 
-    # get_weeks is the only action of Mapping that would require aws, so I leave it here
-    print(user_info)
     ranking_info = user_info.playoff_user_ranking_dict_format
-    ranking = (ranking_info['data'][0]['rank'] / ranking_info['total'] * 100) / 100
-
     weeks_info = user_info.unblocked_weeks
-    user_profile_info = user_info.playoff_user_profile
+    user_profile_info = user_info.playoff_user_profile_dict_format
+
+    ranking = (ranking_info['data'][0]['rank'] / ranking_info['total'] * 100) / 100
     date_last_play = user_info.date_last_play_timestamp_format
 
     print("MAPPING START")
@@ -185,16 +184,16 @@ def play_action(event, context):
 
         if state_ == 'READY':
             try:
-                UserReady.get(player).save_last_play()
+                UserReady.get(player).save_last_play(playoff_client)
             except UserReady.DoesNotExist:
                 UserReady(player).save()
-                UserReady.get(player).save_last_play()
+                UserReady.get(player).save_last_play(playoff_client)
         else:
             try:
-                User.get(player).save_last_play()
+                User.get(player).save_last_play(playoff_client)
             except User.DoesNotExist:
                 User(player).save()
-                User.get(player).save_last_play()
+                User.get(player).save_last_play(playoff_client)
 
     except PlayoffException as err:
         print(err)
@@ -202,7 +201,7 @@ def play_action(event, context):
             return playoff_player_not_found_error_response(err.message)
         else:
             return playoff_error_response(err.message)
-    result = get_user_status(event, context, player, playoff_client=playoff_client)
+    result = get_user_status(event, context, player, playoff_client=playoff_client, force_update=True)
 
     new_result_body = {
         "points": dynamic_points,
@@ -253,7 +252,7 @@ def level_upgrade_action(event, context):
 
     # per ora consideriamo non necessario l'aggiornamento della data eseguendo un level upgrade
     # User.get(player).save_last_play()
-    return get_user_status(event, context, player, playoff_client)
+    return get_user_status(event, context, player, playoff_client, True)
 
 
 def get_lazy_users(event, context):

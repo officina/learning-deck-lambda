@@ -44,13 +44,16 @@ class User(Model):
         return super().save(*args, **kwargs)
 
     # include anche la logica di durata della cache
-    def update_playoff_user_profile(self, playoff_client):
+    def update_playoff_user_profile(self, playoff_client, force_update=False):
 
-        delta_in_millis = int(PLAYOFF_PROFILE_CACHE_DURATION_IN_MINUTES) * 60 * 1000
-        last_update_in_millis = int(time.mktime(self.playoff_user_profile_last_update.timetuple()))
+        delta_in_millis = int(PLAYOFF_PROFILE_CACHE_DURATION_IN_MINUTES) * 60
+        try:
+            last_update_in_millis = int(time.mktime(self.playoff_user_profile_last_update.timetuple()))
+        except:
+            last_update_in_millis = -1
         now_in_millis = int(time.mktime(datetime.now().astimezone(pytz.UTC).timetuple()))
 
-        if self.playoff_user_profile is not None and now_in_millis > last_update_in_millis + delta_in_millis:
+        if not force_update and self.playoff_user_profile is not None and now_in_millis < last_update_in_millis + delta_in_millis:
             print("Playoff user PROFILE update not needed")
             return self
         else:
@@ -58,15 +61,19 @@ class User(Model):
             result = playoff_client.get(route=f"/admin/players/{self.user_id}")
             self.playoff_user_profile = json.dumps(result)
             self.playoff_user_profile_last_update = datetime.now().astimezone(pytz.UTC)
-            return self.save()
+            self.save()
+            return self
 
     # include anche la logica di durata della cache
-    def update_playoff_user_ranking(self, playoff_client):
-        delta_in_millis = int(PLAYOFF_RANKING_CACHE_DURATION_IN_MINUTES) * 60 * 1000
-        last_update_in_millis = int(time.mktime(self.playoff_user_profile_last_update.timetuple()))
+    def update_playoff_user_ranking(self, playoff_client, force_update=False):
+        delta_in_millis = int(PLAYOFF_RANKING_CACHE_DURATION_IN_MINUTES) * 60
+        try:
+            last_update_in_millis = int(time.mktime(self.playoff_user_ranking_last_update.timetuple()))
+        except:
+            last_update_in_millis = -1
         now_in_millis = int(time.mktime(datetime.now().astimezone(pytz.UTC).timetuple()))
 
-        if self.playoff_user_profile is not None and now_in_millis > last_update_in_millis + delta_in_millis:
+        if not force_update and self.playoff_user_profile is not None and now_in_millis < last_update_in_millis + delta_in_millis:
             print("Playoff user RANKING update not needed")
             return self
         else:
@@ -118,18 +125,11 @@ class User(Model):
             return False
 
     @property
-    def playoff_user_ranking_dict_format(self, delta=-1):
+    def playoff_user_ranking_dict_format(self):
         if self.playoff_user_ranking:
             return json.loads(self.playoff_user_ranking)
         else:
             return None
-
-    @property
-    def playoff_user_ranking_validity(self, delta=-1):
-        if self.playoff_user_ranking:
-            return True
-        else:
-            return False
 
 
 class UserReady(Model):
@@ -158,13 +158,16 @@ class UserReady(Model):
         return super().save(*args, **kwargs)
 
     # include anche la logica di durata della cache
-    def update_playoff_user_profile(self, playoff_client):
+    def update_playoff_user_profile(self, playoff_client, force_update=False):
 
-        delta_in_millis = int(PLAYOFF_PROFILE_CACHE_DURATION_IN_MINUTES) * 60 * 1000
-        last_update_in_millis = int(time.mktime(self.playoff_user_profile_last_update.timetuple()))
+        delta_in_millis = int(PLAYOFF_PROFILE_CACHE_DURATION_IN_MINUTES) * 60
+        try:
+            last_update_in_millis = int(time.mktime(self.playoff_user_profile_last_update.timetuple()))
+        except:
+            last_update_in_millis = -1
         now_in_millis = int(time.mktime(datetime.now().astimezone(pytz.UTC).timetuple()))
 
-        if self.playoff_user_profile is not None and now_in_millis > last_update_in_millis + delta_in_millis:
+        if not force_update and self.playoff_user_profile is not None and now_in_millis < last_update_in_millis + delta_in_millis:
             print("Playoff user PROFILE update not needed")
             return self
         else:
@@ -172,15 +175,19 @@ class UserReady(Model):
             result = playoff_client.get(route=f"/admin/players/{self.user_id}")
             self.playoff_user_profile = json.dumps(result)
             self.playoff_user_profile_last_update = datetime.now().astimezone(pytz.UTC)
-            return self.save()
+            self.save()
+            return self
 
     # include anche la logica di durata della cache
-    def update_playoff_user_ranking(self, playoff_client):
-        delta_in_millis = int(PLAYOFF_RANKING_CACHE_DURATION_IN_MINUTES) * 60 * 1000
-        last_update_in_millis = int(time.mktime(self.playoff_user_profile_last_update.timetuple()))
+    def update_playoff_user_ranking(self, playoff_client, force_update=False):
+        delta_in_millis = int(PLAYOFF_RANKING_CACHE_DURATION_IN_MINUTES) * 60
+        try:
+            last_update_in_millis = int(time.mktime(self.playoff_user_ranking_last_update.timetuple()))
+        except:
+            last_update_in_millis = -1
         now_in_millis = int(time.mktime(datetime.now().astimezone(pytz.UTC).timetuple()))
 
-        if self.playoff_user_profile is not None and now_in_millis > last_update_in_millis + delta_in_millis:
+        if not force_update and self.playoff_user_profile is not None and now_in_millis < last_update_in_millis + delta_in_millis:
             print("Playoff user RANKING update not needed")
             return self
         else:
@@ -198,7 +205,7 @@ class UserReady(Model):
             self.playoff_user_ranking = json.dumps(result)
             self.playoff_user_ranking_last_update = datetime.now().astimezone(pytz.UTC)
             self.save()
-            return self.playoff_user_ranking_dict_format
+            return self
 
     def save_last_play(self, now=None):
         self.date_last_play = (now or datetime.now()).astimezone(pytz.UTC)
@@ -232,7 +239,7 @@ class UserReady(Model):
             return False
 
     @property
-    def playoff_user_ranking_dict_format(self, delta=-1):
+    def playoff_user_ranking_dict_format(self):
         if self.playoff_user_ranking:
             return json.loads(self.playoff_user_ranking)
         else:
