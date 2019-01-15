@@ -25,7 +25,6 @@ class User(Model):
     user_id = attributes.UnicodeAttribute(hash_key=True)
     date_start = attributes.UTCDateTimeAttribute()
     date_last_play = attributes.UTCDateTimeAttribute(null=True)
-    user_profile = attributes.MapAttribute(null=True)
     playoff_user_profile = UnicodeAttribute(null=True)
     playoff_user_profile_last_update = attributes.UTCDateTimeAttribute(null=True)
     playoff_user_ranking = UnicodeAttribute(null=True)
