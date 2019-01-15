@@ -184,16 +184,16 @@ def play_action(event, context):
 
         if state_ == 'READY':
             try:
-                UserReady.get(player).save_last_play(playoff_client)
+                UserReady.get(player).save_last_play()
             except UserReady.DoesNotExist:
                 UserReady(player).save()
-                UserReady.get(player).save_last_play(playoff_client)
+                UserReady.get(player).save_last_play()
         else:
             try:
-                User.get(player).save_last_play(playoff_client)
+                User.get(player).save_last_play()
             except User.DoesNotExist:
                 User(player).save()
-                User.get(player).save_last_play(playoff_client)
+                User.get(player).save_last_play()
 
     except PlayoffException as err:
         print(err)

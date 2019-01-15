@@ -48,6 +48,9 @@ provider:
      PLAYOFF_CLIENT_ID_PUBLISHED: "${self:custom.secrets.PLAYOFF_CLIENT_ID_PUBLISHED}"
      PLAYOFF_CLIENT_SECRET_PUBLISHED: "${self:custom.secrets.PLAYOFF_CLIENT_SECRET_PUBLISHED}"
 
+     PLAYOFF_PROFILE_CACHE_DURATION_IN_MINUTES: '15'
+     PLAYOFF_RANKING_CACHE_DURATION_IN_MINUTES: '15'
+
   iamRoleStatements:
       - Effect: Allow
         Action:
