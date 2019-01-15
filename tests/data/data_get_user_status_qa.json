@@ -1,6 +1,6 @@
 {
    "resource":"/api/userstatus/{player}",
-   "path":"/api/userstatus/player_10",
+   "path":"/api/userstatus/player_18",
    "httpMethod":"GET",
    "headers":{
       "Accept":"*/*",
@@ -59,7 +59,7 @@
       ]
    },
    "pathParameters":{
-      "player":"player_11"
+      "player":"player_18"
    },
    "stageVariables":"",
    "requestContext":{

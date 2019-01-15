@@ -82,6 +82,8 @@ def get_user_status(event, context, player, playoff_client):
     print("WEEKS CALCULATION")
     weeks = get_weeks(player, state_)
     if state_ == 'READY':
+        UserReady.get(player).save_playoff_user_profile(playoff_client)
+        UserReady.get(player).save_playoff_user_ranking(playoff_client)
         date_last_play = UserReady.get(player).date_last_play_timestamp_format
         print("READY:")
         print(date_last_play)

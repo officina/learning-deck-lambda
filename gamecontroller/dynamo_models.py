@@ -1,10 +1,10 @@
 import os
 import pytz
-
 from datetime import datetime, timedelta
-
+import json
 from pynamodb.models import Model
 from pynamodb import attributes
+from pynamodb.attributes import UnicodeAttribute
 import time
 
 # Defaults are handy when testing iteractively
@@ -23,6 +23,7 @@ class User(Model):
     user_id = attributes.UnicodeAttribute(hash_key=True)
     date_start = attributes.UTCDateTimeAttribute()
     date_last_play = attributes.UTCDateTimeAttribute(null=True)
+    user_profile = attributes.MapAttribute(null=True)
 
     @classmethod
     def get_lazy_users(cls, date=None, days=None, state="PUBLISHED"):
@@ -35,6 +36,11 @@ class User(Model):
         if not self.date_start:
             self.date_start = datetime.now().astimezone(pytz.UTC)
         return super().save(*args, **kwargs)
+
+    def save_user_profile(self, playoff_client):
+        result = playoff_client.get(route=f"/admin/players/{self.user_id}")
+        self.user_profile = result
+        return self.save()
 
     def save_last_play(self, now=None):
         self.date_last_play = (now or datetime.now()).astimezone(pytz.UTC)
@@ -62,6 +68,10 @@ class UserReady(Model):
     user_id = attributes.UnicodeAttribute(hash_key=True)
     date_start = attributes.UTCDateTimeAttribute()
     date_last_play = attributes.UTCDateTimeAttribute(null=True)
+    playoff_user_profile = UnicodeAttribute(null=True)
+    playoff_user_profile_last_update = attributes.UTCDateTimeAttribute(null=True)
+    playoff_user_ranking = UnicodeAttribute(null=True)
+    playoff_user_ranking_last_update = attributes.UTCDateTimeAttribute(null=True)
 
     @classmethod
     def get_lazy_users(cls, date=None, days=None, state="PUBLISHED"):
@@ -74,6 +84,27 @@ class UserReady(Model):
         if not self.date_start:
             self.date_start = datetime.now().astimezone(pytz.UTC)
         return super().save(*args, **kwargs)
+
+    def save_playoff_user_profile(self, playoff_client):
+        result = playoff_client.get(route=f"/admin/players/{self.user_id}")
+        self.playoff_user_profile = json.dumps(result)
+        self.playoff_user_profile_last_update = datetime.now().astimezone(pytz.UTC)
+        return self.save()
+
+    def save_playoff_user_ranking(self, playoff_client):
+        result = playoff_client.get(
+            route="/runtime/leaderboards/progressione_personale",
+            query={
+                "player_id": self.user_id,
+                "cycle": "alltime",
+                "entity_id": self.user_id,
+                "radius": "0",
+                "sort": "descending",
+                "ranking": "relative"
+            })
+        self.playoff_user_ranking = json.dumps(result)
+        self.playoff_user_ranking_last_update = datetime.now().astimezone(pytz.UTC)
+        return self.save()
 
     def save_last_play(self, now=None):
         self.date_last_play = (now or datetime.now()).astimezone(pytz.UTC)
@@ -91,6 +122,20 @@ class UserReady(Model):
     def unblocked_weeks(self):
         weeks = (datetime.now().astimezone(pytz.UTC) - self.date_start).days // 7
         return weeks + 1
+
+    @property
+    def playoff_user_profile_dict_format(self):
+        if self.playoff_user_profile:
+            return json.loads(self.playoff_user_profile)
+        else:
+            return None
+
+    @property
+    def playoff_user_ranking_dict_format(self):
+        if self.playoff_user_ranking:
+            return json.loads(self.playoff_user_ranking)
+        else:
+            return None
 
 
 class Token(Model):
