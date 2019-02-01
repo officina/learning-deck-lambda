@@ -101,7 +101,7 @@ class User(Model):
 
     @property
     def date_last_play_timestamp_format(self):
-        print(f"date_last_play_timestamp_format on table {USERS_READY_TABLE_NAME} and model UserReady")
+        print(f"date_last_play_timestamp_format on table {USERS_TABLE_NAME} and model User")
         if self.date_last_play:
             return int(time.mktime(self.date_last_play.timetuple()))
         else:

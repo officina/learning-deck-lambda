@@ -124,9 +124,7 @@ class Playoff:
     except URLError as e:
       print("URLError")
       print(e)
-      err = json.loads(e.read())
-      e.close()
-      raise PlayoffException(err['error'], err['error_description'])
+      raise PlayoffException("Playoff generic error", "Playoff generic error")
     except Exception as e:
       print(e)
       print("Generic exception!")

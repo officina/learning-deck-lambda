@@ -60,6 +60,11 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
     if event["queryStringParameters"] is not None and "SOURCE" in event["queryStringParameters"]:
         print("Source parameter == WEB")
         web_source = event["queryStringParameters"]["SOURCE"] == "WEB"
+
+    # import time
+    # if (player == 'caacdb6e6f3f47258b9f0707c35c7f93') and state_ != 'READY':
+    #     time.sleep(20)
+
     try:
         if state_ == 'READY':
             try:
@@ -96,6 +101,9 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
         ranking = -1
     else:
         ranking = (ranking_info['data'][0]['rank'] / ranking_info['total'] * 100) / 100
+
+    # if (player == 'b0cb26451830466ea628c7599a2e2186') and state_ != 'READY':
+    #     ranking = 1
 
     date_last_play = user_info.date_last_play_timestamp_format
 
