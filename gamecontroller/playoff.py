@@ -6,6 +6,7 @@ import time
 import jwt
 import datetime
 from urllib.error import URLError, HTTPError
+import random
 
 import ssl
 
@@ -84,18 +85,33 @@ class Playoff:
       self.get_access_token()
       access_token = self.load()
     query['access_token'] = access_token['access_token']
-    headers = { 'Accept': 'text/json', 'Content-Type': 'application/json' }
-    req = urllib.request.Request("https://api."+ self.hostname +"/%s%s?%s" %(self.version, route, urllib.parse.urlencode(query)), json.dumps(body).encode("utf-8"), headers)
+    # headers = {'Accept': 'text/json', 'Content-Type': 'application/json', 'Host': 'api.playoffgenerali.it' }
+    headers = {'Accept': 'text/json', 'Content-Type': 'application/json'}
+    ip_list = ["10.139.232.101", "10.139.232.100"]
+    my_ip = random.choice(ip_list)
+    print(f"My ip: {my_ip}")
+    req = urllib.request.Request("https://api." + self.hostname + "/%s%s?%s" %(self.version, route, urllib.parse.urlencode(query)), json.dumps(body).encode("utf-8"), headers)
     req.get_method = lambda: method.upper()
+
+    # ctx = ssl.create_default_context()
+    # ctx.check_hostname = False
+    # ctx.verify_mode = ssl.CERT_NONE
+
     response = ''
     try:
       print("Sending request ...")
       try:
+
           response = urllib.request.urlopen(req, timeout=1)
       except Exception as e:
           print(e)
           print("Request timout, again...")
-          response = urllib.request.urlopen(req, timeout=2)
+          try:
+              response = urllib.request.urlopen(req, timeout=2)
+          except Exception as e:
+              print("Second timeout")
+              response = urllib.request.urlopen(req, timeout=2)
+              print("Second timeout OK")
       print(f"Status code: {response.code}")
       if raw == True:
         raw_data = response.read()
@@ -112,7 +128,7 @@ class Playoff:
         response.close()
         return json_data
     except HTTPError as e:
-      print("HTTPError")
+      print("HTTPError - Third timeout")
       print(e)
       err = json.loads(e.read())
       e.close()
@@ -122,11 +138,12 @@ class Playoff:
           return self.api(method, route, query, body, raw, True)
       raise PlayoffException(err['error'], err['error_description'])
     except URLError as e:
-      print("URLError")
+      print("URLError - Third timeout")
       print(e)
       raise PlayoffException("Playoff generic error", "Playoff generic error")
     except Exception as e:
       print(e)
+      print(type(e))
       print("Generic exception!")
       raise PlayoffException("Playoff generic error", "Playoff generic error")
 
