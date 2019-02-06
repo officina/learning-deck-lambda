@@ -100,7 +100,8 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
     if web_source:
         ranking = -1
     else:
-        ranking = (ranking_info['data'][0]['rank'] / ranking_info['total'] * 100) / 100
+        ranking = ((ranking_info['data'][0]['rank'] / ranking_info['total'] * 100) / 100)
+        # ranking = int(100 - ((ranking_info['data'][0]['rank'] / ranking_info['total'] * 100) / 100))
 
     # if (player == 'b0cb26451830466ea628c7599a2e2186') and state_ != 'READY':
     #     ranking = 1
