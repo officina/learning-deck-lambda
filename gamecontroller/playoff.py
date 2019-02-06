@@ -87,9 +87,9 @@ class Playoff:
     query['access_token'] = access_token['access_token']
     # headers = {'Accept': 'text/json', 'Content-Type': 'application/json', 'Host': 'api.playoffgenerali.it' }
     headers = {'Accept': 'text/json', 'Content-Type': 'application/json'}
-    ip_list = ["10.139.232.101", "10.139.232.100"]
-    my_ip = random.choice(ip_list)
-    print(f"My ip: {my_ip}")
+    # ip_list = ["10.139.232.101", "10.139.232.100"]
+    # my_ip = random.choice(ip_list)
+    # print(f"My ip: {my_ip}")
     req = urllib.request.Request("https://api." + self.hostname + "/%s%s?%s" %(self.version, route, urllib.parse.urlencode(query)), json.dumps(body).encode("utf-8"), headers)
     req.get_method = lambda: method.upper()
 
@@ -101,14 +101,13 @@ class Playoff:
     try:
       print("Sending request ...")
       try:
-
           response = urllib.request.urlopen(req, timeout=1)
-      except Exception as e:
+      except URLError as e:
           print(e)
           print("Request timout, again...")
           try:
               response = urllib.request.urlopen(req, timeout=2)
-          except Exception as e:
+          except URLError as e:
               print("Second timeout")
               response = urllib.request.urlopen(req, timeout=2)
               print("Second timeout OK")
@@ -128,7 +127,7 @@ class Playoff:
         response.close()
         return json_data
     except HTTPError as e:
-      print("HTTPError - Third timeout")
+      print("HTTPError")
       print(e)
       err = json.loads(e.read())
       e.close()
