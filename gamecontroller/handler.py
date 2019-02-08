@@ -102,7 +102,7 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
     else:
         ranking_ = ranking_info['data'][0]['rank'] / ranking_info['total']
         import math
-        ranking = 1 - math.floor(ranking_ * 100) / 100
+        ranking = math.floor((1 - ranking_) * 100) / 100
         # ranking = round(1 - ((ranking_info['data'][0]['rank'] / ranking_info['total']) / 100), 2)
 
     # if (player == 'b0cb26451830466ea628c7599a2e2186') and state_ != 'READY':
@@ -241,9 +241,16 @@ def user_status_action(event, context):
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
 
+    if event["queryStringParameters"] is not None and "force_cache_update" in event["queryStringParameters"]:
+        force_cache_update = True
+        print("Force update required")
+    else:
+        force_cache_update = False
+        print("Force update not required")
+
     playoff_client = get_playoff_client(state_)
     player = event['pathParameters']['player']
-    return get_user_status(event, context, player, playoff_client)
+    return get_user_status(event, context, player, playoff_client, force_cache_update)
 
 
 def level_upgrade_action(event, context):
