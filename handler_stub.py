@@ -9,6 +9,7 @@ def user_status_action(event, context):
         'statusCode': result['statusCode'],
         'body': json.dumps(result['body'])
     }
+    print(response)
     return response
 
 
@@ -37,7 +38,6 @@ def play_action(event, context):
     }
 
     print(response)
-
     return response
 
 
@@ -48,6 +48,8 @@ def level_upgrade(event, context):
         'statusCode': result['statusCode'],
         'body': json.dumps(result['body'])
     }
+
+    print(response)
     return response
 
 
@@ -58,6 +60,7 @@ def get_lazy_users(event, context):
         'statusCode': 200,
         'body': json.dumps(result)
     }
+    print(response)
     return response
 
 def reset_players(event, context):

@@ -6,8 +6,6 @@ import time
 import jwt
 import datetime
 from urllib.error import URLError, HTTPError
-import random
-
 import ssl
 
 
@@ -101,16 +99,21 @@ class Playoff:
     try:
       print("Sending request ...")
       try:
+          print("Attempt1")
           response = urllib.request.urlopen(req, timeout=1)
+          print("Attempt1 - OK")
       except URLError as e:
           print(e)
           print("Request timout, again...")
           try:
-              response = urllib.request.urlopen(req, timeout=2)
+              print("Attempt2")
+              response = urllib.request.urlopen(req, timeout=1)
+              print("Attempt2 - OK")
+              time.sleep(1)
           except URLError as e:
-              print("Second timeout")
+              print("Attempt3")
               response = urllib.request.urlopen(req, timeout=2)
-              print("Second timeout OK")
+              print("Attempt3 - OK")
       print(f"Status code: {response.code}")
       if raw == True:
         raw_data = response.read()
