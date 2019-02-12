@@ -48,6 +48,9 @@ provider:
      PLAYOFF_CLIENT_ID_PUBLISHED: "${self:custom.secrets.PLAYOFF_CLIENT_ID_PUBLISHED}"
      PLAYOFF_CLIENT_SECRET_PUBLISHED: "${self:custom.secrets.PLAYOFF_CLIENT_SECRET_PUBLISHED}"
 
+     PLAYOFF_PROFILE_CACHE_DURATION_IN_MINUTES: '720'
+     PLAYOFF_RANKING_CACHE_DURATION_IN_MINUTES: '720'
+
   iamRoleStatements:
       - Effect: Allow
         Action:
@@ -85,7 +88,7 @@ functions:
 
   play_action:
     handler: handler_stub.play_action
-    timeout: 30
+    timeout: 10
     events:
       - http:
           path: api/play/{player}
@@ -94,7 +97,7 @@ functions:
           authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
   get_user_status:
     handler: handler_stub.user_status_action
-    timeout: 30
+    timeout: 10
     events:
       - http:
           path: api/userstatus/{player}
@@ -103,7 +106,7 @@ functions:
           authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
   level_upgrade:
     handler: handler_stub.level_upgrade
-    timeout: 30
+    timeout: 10
     events:
       - http:
           path: api/levelupgrade/{player}
@@ -111,21 +114,21 @@ functions:
           cors: true
   get_lazy_users:
     handler: handler_stub.get_lazy_users
-    timeout: 30
+    timeout: 10
     events:
       - http:
           path: api/lazyusers/{from}
           method: get
           cors: true
           authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
-  reset_players:
-    handler: handler_stub.reset_players
-    timeout: 300
-    events:
-      - schedule:
-          rate: cron(0 9,13 ? * MON-FRI *)
-      - schedule:
-          rate: cron(0 15 ? * MON-THU *)
+#  reset_players:
+#    handler: handler_stub.reset_players
+#    timeout: 300
+#    events:
+#      - schedule:
+#          rate: cron(0 9,13 ? * MON-FRI *)
+#      - schedule:
+#          rate: cron(0 15 ? * MON-THU *)
 resources:
   Resources:
     ${file(config/configs-${opt:stage, self:provider.stage}.yml):additionalResources}

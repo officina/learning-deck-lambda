@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 import boto3
 
-from playoff import Playoff, PlayoffException
+from .playoff import Playoff, PlayoffException
 
 from .mapping import Mapping
 from .dynamo_models import User, UserReady, Token
@@ -31,40 +31,76 @@ def get_playoff_client(state='PUBLISHED'):
     if state == 'READY':
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_READY')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_READY')
+        po_state = "ready"
     else:
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_PUBLISHED')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_PUBLISHED')
+        po_state = "published"
+
+    print(CLIENT_ID)
 
     client = Playoff(
         hostname=HOSTNAME,
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         type="client",
-        store=lambda token: Token.set_token_dynamo(token),
-        load=lambda: Token.get_token_dynamo(),
+        store=lambda token: Token.set_token_dynamo(token, po_state),
+        load=lambda: Token.get_token_dynamo(po_state),
     )
     print("Creation OK with ref-time " + str(datetime.now()))
     return client
 
 
-def get_user_status(event, context, player, playoff_client):
+def get_real_players_count(state='PUBLISHED'):
+
+    if state == 'READY':
+        table_name = os.environ.get('DYNAMODB_USERS_READY_INFO_TABLE')
+    else:
+        table_name = os.environ.get('DYNAMODB_USERS_INFO_TABLE')
+
+    response = boto3.client('dynamodb').describe_table(
+        TableName=table_name
+    )
+
+    index = [x for x in response['Table']['GlobalSecondaryIndexes'] if x['IndexName'] == 'date_last_play-index']
+    return index[0]['ItemCount']
+
+
+def get_user_status(event, context, player, playoff_client, force_update=False):
     print("Get user status - START")
     state_ = "PUBLISHED"
+    web_source = False
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
+    if event["queryStringParameters"] is not None and "SOURCE" in event["queryStringParameters"]:
+        print("Source parameter == WEB")
+        web_source = event["queryStringParameters"]["SOURCE"] == "WEB"
+
+    # import time
+    # if (player == 'caacdb6e6f3f47258b9f0707c35c7f93') and state_ != 'READY':
+    #     time.sleep(20)
+
     try:
-        # calcolo prima il ranking per consentire se necessaro di "attivare" il boot di player appena creati
-        result_ranking = playoff_client.get(
-            route="/runtime/leaderboards/progressione_personale",
-            query={
-                "player_id": player,
-                "cycle": "alltime",
-                "entity_id": player,
-                "radius": "0",
-                "sort": "descending",
-                "ranking": "relative"
-            })
-        result = playoff_client.get(route=f"/admin/players/{player}")
+        if state_ == 'READY':
+            try:
+                if not web_source:
+                    UserReady.get(player).update_playoff_user_ranking(playoff_client, force_update)
+                user_info = UserReady.get(player).update_playoff_user_profile(playoff_client, force_update)
+            except UserReady.DoesNotExist:
+                print("exception")
+                UserReady(player).save()
+                UserReady.get(player).update_playoff_user_ranking(playoff_client)
+                user_info = UserReady.get(player).update_playoff_user_profile(playoff_client)
+        else:
+            try:
+                if not web_source:
+                    User.get(player).update_playoff_user_ranking(playoff_client, force_update)
+                user_info = User.get(player).update_playoff_user_profile(playoff_client, force_update)
+            except User.DoesNotExist:
+                User(player).save()
+                User.get(player).update_playoff_user_ranking(playoff_client)
+                user_info = User.get(player).update_playoff_user_profile(playoff_client)
+
     except PlayoffException as err:
         print(err)
         if err.name == 'player_not_found':
@@ -72,17 +108,29 @@ def get_user_status(event, context, player, playoff_client):
         else:
             return playoff_error_response(err.message)
 
-    # get_weeks is the only action of Mapping that would require aws, so I leave it here
-    print("RANKING CALCULATION")
-    ranking = (result_ranking['data'][0]['rank'] / result_ranking['total'] * 100) / 100
-    print("WEEKS CALCULATION")
-    weeks = get_weeks(player, state_)
-    if state_ == 'READY':
-        date_last_play = UserReady.get(player).date_last_play_timestamp_format
+    ranking_info = user_info.playoff_user_ranking_dict_format
+    weeks_info = user_info.unblocked_weeks
+    user_profile_info = user_info.playoff_user_profile_dict_format
+    # nel caso di web_source non calcoliamo il ranking perché non è necessario
+    if web_source:
+        ranking = -1
     else:
-        date_last_play = User.get(player).date_last_play_timestamp_format
+        try:
+            total_players = get_real_players_count(state_) + 1
+            # total_players = ranking_info['total']
+            my_position = ranking_info['data'][0]['rank']
+            print(f"Ranking calculation with total players {total_players} and my position {my_position}")
+            ranking_ = my_position / total_players
+            import math
+            ranking = math.floor((1 - ranking_) * 100) / 100
+            print(f"Ranking: {ranking_}")
+        except Exception as e:
+            ranking = 0.99
+
+    date_last_play = user_info.date_last_play_timestamp_format
+
     print("MAPPING START")
-    return Mapping(result, weeks, ranking=ranking, date_last_play=date_last_play).json
+    return Mapping(user_profile_info, weeks_info, ranking=ranking, date_last_play=date_last_play).json
 
 
 def get_weeks(player, state="PUBLISHED"):
@@ -193,7 +241,7 @@ def play_action(event, context):
             return playoff_player_not_found_error_response(err.message)
         else:
             return playoff_error_response(err.message)
-    result = get_user_status(event, context, player, playoff_client=playoff_client)
+    result = get_user_status(event, context, player, playoff_client=playoff_client, force_update=True)
 
     new_result_body = {
         "points": dynamic_points,
@@ -212,9 +260,16 @@ def user_status_action(event, context):
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
 
+    if event["queryStringParameters"] is not None and "force_cache_update" in event["queryStringParameters"]:
+        force_cache_update = True
+        print("Force update required")
+    else:
+        force_cache_update = False
+        print("Force update not required")
+
     playoff_client = get_playoff_client(state_)
     player = event['pathParameters']['player']
-    return get_user_status(event, context, player, playoff_client)
+    return get_user_status(event, context, player, playoff_client, force_cache_update)
 
 
 def level_upgrade_action(event, context):
@@ -244,7 +299,7 @@ def level_upgrade_action(event, context):
 
     # per ora consideriamo non necessario l'aggiornamento della data eseguendo un level upgrade
     # User.get(player).save_last_play()
-    return get_user_status(event, context, player, playoff_client)
+    return get_user_status(event, context, player, playoff_client, True)
 
 
 def get_lazy_users(event, context):

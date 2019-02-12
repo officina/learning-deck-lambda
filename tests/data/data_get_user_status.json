@@ -1,6 +1,6 @@
 {
    "resource":"/api/userstatus/{player}",
-   "path":"/api/userstatus/lucia",
+   "path":"/api/userstatus/b0cb26451830466ea628c7599a2e2186",
    "httpMethod":"GET",
    "headers":{
       "Accept":"*/*",
@@ -83,11 +83,11 @@
    },
    "multiValueQueryStringParameters":{
       "state":[
-         "READY"
+         "READY2"
       ]
    },
    "pathParameters":{
-      "player":"player_1"
+      "player":"b0cb26451830466ea628c7599a2e2186"
    },
    "stageVariables":"",
    "requestContext":{
