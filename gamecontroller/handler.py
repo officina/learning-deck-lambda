@@ -117,6 +117,7 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
     else:
         try:
             total_players = get_real_players_count(state_) + 1
+            # total_players = ranking_info['total']
             my_position = ranking_info['data'][0]['rank']
             print(f"Ranking calculation with total players {total_players} and my position {my_position}")
             ranking_ = my_position / total_players
