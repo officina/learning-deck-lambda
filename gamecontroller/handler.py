@@ -51,6 +51,21 @@ def get_playoff_client(state='PUBLISHED'):
     return client
 
 
+def get_real_players_count(state='PUBLISHED'):
+
+    if state == 'READY':
+        table_name = os.environ.get('DYNAMODB_USERS_READY_INFO_TABLE')
+    else:
+        table_name = os.environ.get('DYNAMODB_USERS_INFO_TABLE')
+
+    response = boto3.client('dynamodb').describe_table(
+        TableName=table_name
+    )
+
+    index = [x for x in response['Table']['GlobalSecondaryIndexes'] if x['IndexName'] == 'date_last_play-index']
+    return index[0]['ItemCount']
+
+
 def get_user_status(event, context, player, playoff_client, force_update=False):
     print("Get user status - START")
     state_ = "PUBLISHED"
@@ -100,13 +115,16 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
     if web_source:
         ranking = -1
     else:
-        ranking_ = ranking_info['data'][0]['rank'] / ranking_info['total']
-        import math
-        ranking = math.floor((1 - ranking_) * 100) / 100
-        # ranking = round(1 - ((ranking_info['data'][0]['rank'] / ranking_info['total']) / 100), 2)
-
-    # if (player == 'b0cb26451830466ea628c7599a2e2186') and state_ != 'READY':
-    #     ranking = 1
+        try:
+            total_players = get_real_players_count(state_) + 1
+            my_position = ranking_info['data'][0]['rank']
+            print(f"Ranking calculation with total players {total_players} and my position {my_position}")
+            ranking_ = my_position / total_players
+            import math
+            ranking = math.floor((1 - ranking_) * 100) / 100
+            print(f"Ranking: {ranking_}")
+        except Exception as e:
+            ranking = 0.99
 
     date_last_play = user_info.date_last_play_timestamp_format
 
