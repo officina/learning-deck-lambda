@@ -97,7 +97,9 @@ class Mapping:
             if 'metric' in score and 'value' in score:
                 metric = score['metric']
                 if metric['id'].startswith('livelli_'):
+                    value = int(score['value']['name'].replace('stato_', ''))
                     key = map[metric['id']]
+                    status[key] = value
                     hi = int(score['meta']['high'])
                     lw = int(score['meta']['low'])
                     print(f"Recap per {metric['id']}: hi={hi} lw={lw}")
