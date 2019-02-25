@@ -93,17 +93,20 @@ class Mapping:
 
         print(f"temp values {temp_values}")
 
-        for score in self.result['scores']:
-            if 'metric' in score and 'value' in score:
-                metric = score['metric']
-                if metric['id'].startswith('livelli_'):
-                    value = int(score['value']['name'].replace('stato_', ''))
-                    key = map[metric['id']]
-                    status[key] = value
-                    hi = int(score['meta']['high'])
-                    lw = int(score['meta']['low'])
-                    print(f"Recap per {metric['id']}: hi={hi} lw={lw}")
-                    self.upgrade[key] = (hi - lw + 1)
+        if self.result['id'] == 'b0cb26451830466ea628c7599a2e2186':
+            for score in self.result['scores']:
+                if 'metric' in score and 'value' in score:
+                    metric = score['metric']
+                    if metric['id'].startswith('livelli_'):
+                        value = int(score['value']['name'].replace('stato_', ''))
+                        key = map[metric['id']]
+                        status[key] = value
+                        hi = int(score['meta']['high'])
+                        lw = int(score['meta']['low'])
+                        print(f"Recap per {metric['id']}: hi={hi} lw={lw}")
+                        self.upgrade[key] = (hi - lw + 1)
+        else:
+
 
         return status
 
