@@ -68,6 +68,8 @@ def get_real_players_count(state='PUBLISHED'):
 
 def get_user_status(event, context, player, playoff_client, force_update=False):
     print("Get user status - START")
+    import socket
+    print(f"socket.gethostbyname(\'{HOSTNAME}\') --> {socket.gethostbyname(HOSTNAME)}")
     state_ = "PUBLISHED"
     web_source = False
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
@@ -198,6 +200,10 @@ def play_action(event, context):
     choices = {var['q']: var['a'] for var in event_body['choices']}
     player = event['pathParameters']['player']
 
+    # import time
+    # if (player == '015eb2fe2b56489792694693b043d63a') and state_ == 'READY':
+    #     time.sleep(50)
+
     try:
         print("Before post - play_action")
         result_post = playoff_client.post(
@@ -277,8 +283,14 @@ def level_upgrade_action(event, context):
     state_ = "PUBLISHED"
     if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
         state_ = event["queryStringParameters"]["state"]
+
     playoff_client = get_playoff_client(state_)
     player = event['pathParameters']['player']
+
+    # import time
+    # if (player == '015eb2fe2b56489792694693b043d63a') and state_ == 'READY':
+    #     time.sleep(50)
+
     map = {
         "casa": 'compra_casa_livello',
         "mobilita": 'compra_mobilita_livello',

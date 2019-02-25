@@ -82,15 +82,26 @@ class Mapping:
 
         status = {}
         self.upgrade = {}
+
+        temp_values = dict()
+        temp_coins = 0
+
+        for score in self.result['scores']:
+            if 'metric' in score and score['metric']['id'] == 'monete':
+                temp_coins = int(score['value'])
+                break
+
+        print(f"temp values {temp_values}")
+
         for score in self.result['scores']:
             if 'metric' in score and 'value' in score:
                 metric = score['metric']
                 if metric['id'].startswith('livelli_'):
-                    value = int(score['value']['name'].replace('stato_', ''))
                     key = map[metric['id']]
-                    status[key] = value
                     hi = int(score['meta']['high'])
-                    self.upgrade[key] = hi - value + 1
+                    lw = int(score['meta']['low'])
+                    print(f"Recap per {metric['id']}: hi={hi} lw={lw}")
+                    self.upgrade[key] = (hi - lw + 1)
 
         return status
 
