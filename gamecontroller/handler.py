@@ -132,7 +132,13 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
     date_last_play = user_info.date_last_play_timestamp_format
 
     print("MAPPING START")
-    return Mapping(user_profile_info, weeks_info, ranking=ranking, date_last_play=date_last_play).json
+    result = Mapping(user_profile_info, weeks_info, ranking=ranking, date_last_play=date_last_play).json
+    print(result)
+    if bool(result["body"]["world"]["status"]):
+        return result
+    else:
+        print("Warning - internal retry")
+        return get_user_status(event, context, player, playoff_client, True)
 
 
 def get_weeks(player, state="PUBLISHED"):
