@@ -41,6 +41,9 @@ consente di accedere alla tabella dynamo utilizzata.
 
 ##Esecuzioni lambda
 
+Get user status in ambiente PROD:  
+        `node_modules/serverless/bin/serverless invoke local -f get_user_status -p tests/data/data_get_user_status_prod.json --stage prod`
+
 Get user status in ambiente QA:  
         `node_modules/serverless/bin/serverless invoke local -f get_user_status -p tests/data/data_get_user_status_qa.json --stage qa --playoff_hostname playoffgenerali.it`
     

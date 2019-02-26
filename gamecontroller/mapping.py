@@ -82,6 +82,7 @@ class Mapping:
 
         status = {}
         self.upgrade = {}
+
         for score in self.result['scores']:
             if 'metric' in score and 'value' in score:
                 metric = score['metric']
@@ -90,7 +91,11 @@ class Mapping:
                     key = map[metric['id']]
                     status[key] = value
                     hi = int(score['meta']['high'])
-                    self.upgrade[key] = hi - value + 1
+                    lw = int(score['meta']['low'])
+                    print(f"Recap per {metric['id']}: hi={hi} lw={lw}")
+                    self.upgrade[key] = (hi - lw + 1)
+
+
 
         return status
 
