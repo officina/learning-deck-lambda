@@ -85,7 +85,7 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
     try:
         if state_ == 'READY':
             try:
-                if not web_source:
+                if not web_source or force_update:
                     UserReady.get(player).update_playoff_user_ranking(playoff_client, force_update)
                 user_info = UserReady.get(player).update_playoff_user_profile(playoff_client, force_update)
             except UserReady.DoesNotExist:
@@ -95,7 +95,7 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
                 user_info = UserReady.get(player).update_playoff_user_profile(playoff_client)
         else:
             try:
-                if not web_source:
+                if not web_source or force_update:
                     User.get(player).update_playoff_user_ranking(playoff_client, force_update)
                 user_info = User.get(player).update_playoff_user_profile(playoff_client, force_update)
             except User.DoesNotExist:
