@@ -44,20 +44,20 @@ additionalResources:
       ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
-  ipAuthTable:
-    Type: AWS::DynamoDB::Table
-    DeletionPolicy: Delete
-    Properties:
-      TableName: ${self:provider.environment.DYNAMODB_IP_AUTH_TABLE}
-      AttributeDefinitions:
-        - AttributeName: ip
-          AttributeType: S
-      KeySchema:
-        - AttributeName: ip
-          KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
+#  ipAuthTable:
+#    Type: AWS::DynamoDB::Table
+#    DeletionPolicy: Delete
+#    Properties:
+#      TableName: ${self:provider.environment.DYNAMODB_IP_AUTH_TABLE}
+#      AttributeDefinitions:
+#        - AttributeName: ip
+#          AttributeType: S
+#      KeySchema:
+#        - AttributeName: ip
+#          KeyType: HASH
+#      ProvisionedThroughput:
+#        ReadCapacityUnits: 1
+#        WriteCapacityUnits: 1
 customCapacities:
   - table: tokenTable
     read:

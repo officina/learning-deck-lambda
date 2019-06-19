@@ -376,20 +376,20 @@ def reset_players():
         print("Player creato: " + player)
 
 
-def auth(event, context):
-    print(event)
-    # necessario lo split, vedi qui:
-    # https://stackoverflow.com/questions/33062097/how-can-i-retrieve-a-users-public-ip-address-via-amazon-api-gateway-lambda-n
-    caller_ip = event['headers']['X-Forwarded-For'].split(",")[0]
-    dynamo_db = boto3.resource('dynamodb').Table(os.environ['DYNAMODB_IP_AUTH_TABLE'])
-    key = dict()
-    key["ip"] = caller_ip
-    response_result = dynamo_db.get_item(Key=key)
-    # return generatePolicy(1, 'Allow', event['methodArn'])
-    if "Item" in response_result:
-        print(f'{caller_ip} authorized')
-        return generate_policy(caller_ip, 'Allow', event['methodArn'])
-    else:
-        print(f'{caller_ip} unauthorized')
-        return generate_policy(caller_ip, 'Deny', event['methodArn'])
+# def auth(event, context):
+#     print(event)
+#     # necessario lo split, vedi qui:
+#     # https://stackoverflow.com/questions/33062097/how-can-i-retrieve-a-users-public-ip-address-via-amazon-api-gateway-lambda-n
+#     caller_ip = event['headers']['X-Forwarded-For'].split(",")[0]
+#     dynamo_db = boto3.resource('dynamodb').Table(os.environ['DYNAMODB_IP_AUTH_TABLE'])
+#     key = dict()
+#     key["ip"] = caller_ip
+#     response_result = dynamo_db.get_item(Key=key)
+#     # return generatePolicy(1, 'Allow', event['methodArn'])
+#     if "Item" in response_result:
+#         print(f'{caller_ip} authorized')
+#         return generate_policy(caller_ip, 'Allow', event['methodArn'])
+#     else:
+#         print(f'{caller_ip} unauthorized')
+#         return generate_policy(caller_ip, 'Deny', event['methodArn'])
 

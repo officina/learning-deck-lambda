@@ -1,4 +1,4 @@
-# mygenerali-lambda
+# learningdeck-lambda
 ## Setup di progetto
 Il progetto si basa sull'utilizzo del framework *serverless*, tutto il necessario al setup del framework è descritto [qui](https://serverless.com/framework/docs/getting-started/).
 

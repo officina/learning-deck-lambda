@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: mygenerali # NOTE: update this with your service name
+service: learning-deck # NOTE: update this with your service name
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -22,26 +22,26 @@ provider:
   endpointType: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalEndPointType}
   name: aws
   memorySize: 512
-  region: ${opt:region, 'eu-central-1'}
-  runtime: python3.6
+  region: ${opt:region, 'eu-west-1'}
+  runtime: python3.7
   stage: ${opt:stage, 'dev'}
-  profile: ${opt:profile, 'mygenerali-dev'}
+  profile: ${opt:profile, 'learning-deck-dev'}
   environment:
      accountid: '123820204514'
-     PROJECT_NAME: mygenerali-lambda
+     PROJECT_NAME: learning-deck-lambda
      PLAYOFF_HOSTNAME: ${opt:playoff_hostname, 'playoff.cc'}
 
-     DYNAMODB_TOKEN_TABLE: playoff_token-${opt:stage, self:provider.stage}
+     DYNAMODB_TOKEN_TABLE: ld_playoff_token-${opt:stage, self:provider.stage}
      DYNAMODB_TOKEN_TABLE_ARN: "arn:aws:dynamodb:${opt:region, self:provider.region}:${self:provider.environment.accountid}:table/${self:provider.environment.DYNAMODB_TOKEN_TABLE}"
 
-     DYNAMODB_USERS_INFO_TABLE: users_info-${opt:stage, self:provider.stage}
+     DYNAMODB_USERS_INFO_TABLE: ld_users_info-${opt:stage, self:provider.stage}
      DYNAMODB_USERS_INFO_TABLE_ARN: "arn:aws:dynamodb:${opt:region, self:provider.region}:${self:provider.environment.accountid}:table/${self:provider.environment.DYNAMODB_USERS_INFO_TABLE}"
 
-     DYNAMODB_USERS_READY_INFO_TABLE: users_info_ready-${opt:stage, self:provider.stage}
+     DYNAMODB_USERS_READY_INFO_TABLE: ld_users_info_ready-${opt:stage, self:provider.stage}
      DYNAMODB_USERS_READY_INFO_TABLE_ARN: "arn:aws:dynamodb:${opt:region, self:provider.region}:${self:provider.environment.accountid}:table/${self:provider.environment.DYNAMODB_USERS_READY_INFO_TABLE}"
 
-     DYNAMODB_IP_AUTH_TABLE: mygenerali-ipauth-${opt:stage, self:provider.stage}
-     DYNAMODB_IP_AUTH_TABLE_ARN: "arn:aws:dynamodb:${opt:region, self:provider.region}:${self:provider.environment.accountid}:table/${self:provider.environment.DYNAMODB_IP_AUTH_TABLE}"
+#     DYNAMODB_IP_AUTH_TABLE: ld_ipauth-${opt:stage, self:provider.stage}
+#     DYNAMODB_IP_AUTH_TABLE_ARN: "arn:aws:dynamodb:${opt:region, self:provider.region}:${self:provider.environment.accountid}:table/${self:provider.environment.DYNAMODB_IP_AUTH_TABLE}"
 
      PLAYOFF_CLIENT_ID_READY: "${self:custom.secrets.PLAYOFF_CLIENT_ID_READY}"
      PLAYOFF_CLIENT_SECRET_READY: "${self:custom.secrets.PLAYOFF_CLIENT_SECRET_READY}"
@@ -66,7 +66,7 @@ provider:
           - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_USERS_INFO_TABLE}"
           - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_USERS_READY_INFO_TABLE}"
           - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TOKEN_TABLE}"
-          - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_IP_AUTH_TABLE}"
+          # - "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_IP_AUTH_TABLE}"
 package:
   exclude:
     - 'node_modules/**'

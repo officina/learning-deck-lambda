@@ -8,7 +8,7 @@ os.environ['DYNAMODB_USERS_READY_INFO_TABLE'] = 'users_info_ready-qa'
 
 import boto3
 from boto3.dynamodb.conditions import Key,Attr
-boto3.setup_default_session(profile_name='mygenerali-prod')
+boto3.setup_default_session(profile_name='learningdeck-prod')
 dynamodb = boto3.resource('dynamodb', region_name="eu-central-1")
 
 # print(dynamodb.list_tables())
