@@ -5,7 +5,6 @@ Implementazione del capitolo 6.3.1.1 Questa parte non necessita di aws
 """
 import re
 from datetime import datetime
-from pprint import pprint
 
 RESPONSE = {
     "statusCode": 200,
