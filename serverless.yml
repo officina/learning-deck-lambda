@@ -94,7 +94,7 @@ functions:
     timeout: 10
     events:
       - http:
-          path: api/play/{player}
+          path: ${opt:project_name}/play/{player}
           method: put
           cors: true
           authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
@@ -103,7 +103,7 @@ functions:
     timeout: 10
     events:
       - http:
-          path: api/userstatus/{player}
+          path: ${opt:project_name}/userstatus/{player}
           method: get
           cors: true
           authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
@@ -112,7 +112,7 @@ functions:
     timeout: 10
     events:
       - http:
-          path: api/levelupgrade/{player}
+          path: ${opt:project_name}/levelupgrade/{player}
           method: put
           cors: true
   get_lazy_users:
@@ -120,7 +120,7 @@ functions:
     timeout: 10
     events:
       - http:
-          path: api/lazyusers/{from}
+          path: ${opt:project_name}/lazyusers/{from}
           method: get
           cors: true
           authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
