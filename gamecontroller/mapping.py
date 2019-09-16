@@ -73,10 +73,10 @@ class Mapping:
     def get_status(self):
 
         map = {
-            "livelli_casa": 'casa',
-            "livelli_mobilita": 'mobilita',
-            "livelli_mia_vita": 'vita',
-            "livelli_tempo_libero": 'tempo'
+            "livelli_asset_1": 'livelli_asset_1',
+            "livelli_asset_2": 'livelli_asset_2',
+            "livelli_asset_3": 'livelli_asset_3',
+            "livelli_asset_4": 'livelli_asset_4'
         }
 
         status = {}
@@ -88,13 +88,13 @@ class Mapping:
                 if metric['id'].startswith('livelli_'):
                     value = int(score['value']['name'].replace('stato_', ''))
                     key = map[metric['id']]
-                    status[key] = value
+                    # TODO: define a logic
+                    label = metric['name'].replace('livelli ', '')
+                    status[label] = value
                     hi = int(score['meta']['high'])
                     lw = int(score['meta']['low'])
                     print(f"Recap per {metric['id']}: hi={hi} lw={lw}")
-                    self.upgrade[key] = (hi - lw + 1)
-
-
+                    self.upgrade[label] = (hi - lw + 1)
 
         return status
 
@@ -135,24 +135,40 @@ class Mapping:
 
     def get_progress(self):
 
-        progress = {
-            "sicurezza": 0,
-            "salute": 0,
-            "sostenibilita": 0,
-            "risparmio": 0,
-        }
+        progress = {}
+        temp_labels = {}
+        # setup empty object
+        for score in self.result['scores']:
+            if 'metric' in score and 'value' in score:
+                print('-.-.-.-.-.-.-.-.-')
+                print(score)
+                print('-.-.-.-.-.-.-.-.-')
+                metric = score['metric']
+                if 'type' in metric and 'name' in metric and metric['id'] == 'skill_1':
+                    progress[metric['name']] = 0
+                    temp_labels['skill_1'] = metric['name']
+                if 'type' in metric and 'name' in metric and metric['id'] == 'skill_2':
+                    progress[metric['name']] = 0
+                    temp_labels['skill_2'] = metric['name']
+                if 'type' in metric and 'name' in metric and metric['id'] == 'skill_3':
+                    progress[metric['name']] = 0
+                    temp_labels['skill_3'] = metric['name']
+                if 'type' in metric and 'name' in metric and metric['id'] == 'skill_4':
+                    progress[metric['name']] = 0
+                    temp_labels['skill_4'] = metric['name']
+
         for score in self.result['scores']:
             if 'metric' in score and 'value' in score:
                 metric = score['metric']
                 if 'type' in metric and 'name' in metric:
-                    if metric['id'] == 'sicurezza_percentuale':
-                        progress['sicurezza'] = int(score['value'])/100
-                    if metric['id'] == 'salute_percentuale':
-                        progress['salute'] = int(score['value'])/100
-                    if metric['id'] == 'sostenibilita_percentuale':
-                        progress['sostenibilita'] = int(score['value'])/100
-                    if metric['id'] == 'risparmio_percentuale':
-                        progress['risparmio'] = int(score['value'])/100
+                    if metric['id'] == 'skill_1_percentuale':
+                        progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value'])/100
+                    if metric['id'] == 'skill_2_percentuale':
+                        progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value']) / 100
+                    if metric['id'] == 'skill_3_percentuale':
+                        progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value']) / 100
+                    if metric['id'] == 'skill_4_percentuale':
+                        progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value']) / 100
 
         return progress
 

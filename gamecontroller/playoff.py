@@ -80,7 +80,7 @@ class Playoff:
 
     def api(self, method='GET', route='', query = {}, body={}, raw=False, retry_flag=False):
         access_token = self.load()
-        if int(round(time.time())) >= int(access_token['expires_at']):
+        if access_token is None or int(round(time.time())) >= int(access_token['expires_at']):
             print('Access Token Expired')
             self.get_access_token()
             access_token = self.load()

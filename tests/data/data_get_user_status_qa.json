@@ -59,7 +59,7 @@
       ]
    },
    "pathParameters":{
-      "player":"player_18tttt"
+      "player":"nick"
    },
    "stageVariables":"",
    "requestContext":{
