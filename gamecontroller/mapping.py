@@ -140,9 +140,6 @@ class Mapping:
         # setup empty object
         for score in self.result['scores']:
             if 'metric' in score and 'value' in score:
-                print('-.-.-.-.-.-.-.-.-')
-                print(score)
-                print('-.-.-.-.-.-.-.-.-')
                 metric = score['metric']
                 if 'type' in metric and 'name' in metric and metric['id'] == 'skill_1':
                     progress[metric['name']] = 0
