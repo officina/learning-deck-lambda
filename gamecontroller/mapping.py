@@ -62,7 +62,7 @@ class Mapping:
         self.response['body']['world']['status'] = self.get_status()
         points, available = self.get_points()
         self.response['body']['world']['points'] = points
-        self.response['body']['world']['available'] = available
+        # self.response['body']['world']['available'] = available
         self.response['body']['world']['points']['upgrade'] = self.upgrade
         self.response['body']['challenges'] = self.get_challenges(weeks)
         self.response['body']['progress']['params'] = self.get_progress()
