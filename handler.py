@@ -151,38 +151,6 @@ def play_action(event, context):
 
     return response
 
-# def play_action_without_stored_token_retrieval(event, context):
-#
-#
-#     pl = Playoff(
-#         client_id=client_id,
-#         client_secret=client_secret,
-#         type="client",
-#         allow_unsecure=True,
-#
-#     )
-#
-#     r = pl.post(
-#         route="/runtime/actions/sfida1/play",
-#         query={"player_id":"max"},
-#         body={
-#                 "variables": {
-#                     "question": 1,
-#                     "answer": 2
-#                 }
-#         }
-#     )
-#
-#     response = {
-#         "statusCode": 200,
-#         "body": json.dumps(r)
-#     }
-#
-#     return response
-#
-#
-#
-
 
 def get_user_status(event, context):
     response = {

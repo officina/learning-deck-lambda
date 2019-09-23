@@ -270,6 +270,10 @@ class Token(Model):
         ).save()
         print("set_token_dynamo END")
 
+    @property
+    def is_expired(self):
+        return int(round(time.time())) >= int(self.expires_at)
+
     @classmethod
     def get_token_dynamo(cls, po_state, get_original_object=False):
         print(f"LAMBDA - get_token_dynamo START with state {po_state}")

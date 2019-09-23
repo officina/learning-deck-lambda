@@ -125,6 +125,6 @@
       },
       "apiId":"3hicu2ztti"
    },
-   "body":"{\"client_id\": \"YmRjMDRkODctYjA4Ni00NTNlLThlNGEtYTJiN2ZiZmFlOTVl\", \"client_secret\": \"OTEzMThjNWEtODRhZC00MDc2LWI0ZWItY2VlZjA1NTcwNDQwNGMzYTA1ZTAtZGRkZS0xMWU5LTk3MzEtNTkyMWNlZTRmMGQx\"}",
+   "body": null,
     "isBase64Encoded":false
 }

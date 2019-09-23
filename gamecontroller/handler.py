@@ -19,15 +19,15 @@ HOSTNAME = os.environ.get('PLAYOFF_HOSTNAME')
 
 
 def invalid_response(message):
-    return {"statusCode": 400, "body": {"message": message}}
+    return {"statusCode": 400, "body": json.dumps({"message": message})}
 
 
 def playoff_player_not_found_error_response(message):
-    return {"statusCode": 404, "body": {"message": message}}
+    return {"statusCode": 404, "body": json.dumps({"message": message})}
 
 
 def playoff_error_response(message):
-    return {"statusCode": 500, "body": {"message": message}}
+    return {"statusCode": 500, "body": json.dumps({"message": message})}
 
 
 def get_playoff_client(state='PUBLISHED'):
@@ -167,9 +167,9 @@ def get_weeks(player, state="PUBLISHED"):
     return weeks
 
 
-def generate_policy(ip, effect, resource):
+def generate_policy(effect, resource):
     auth_response = dict()
-    auth_response['principalId'] = ip
+    # auth_response['principalId'] = ip
 
     if effect and resource:
         policy_document = {
@@ -386,24 +386,32 @@ def reset_players():
 
 def auth(event, context):
     print(event)
-    # necessario lo split, vedi qui:
-    # https://stackoverflow.com/questions/33062097/how-can-i-retrieve-a-users-public-ip-address-via-amazon-api-gateway-lambda-n
-    caller_ip = event['headers']['X-Forwarded-For'].split(",")[0]
-    dynamo_db = boto3.resource('dynamodb').Table(os.environ['DYNAMODB_IP_AUTH_TABLE'])
-    key = dict()
-    key["ip"] = caller_ip
-    response_result = dynamo_db.get_item(Key=key)
-    # return generatePolicy(1, 'Allow', event['methodArn'])
-    if "Item" in response_result:
-        print(f'{caller_ip} authorized')
-        return generate_policy(caller_ip, 'Allow', event['methodArn'])
+    token = Token.get_token_dynamo('auth', get_original_object=True)
+
+    if token is None:
+        return generate_policy('Deny', event['methodArn'])
+
+    if 'authorizationToken' in event:
+        request_token = event['authorizationToken']
     else:
-        print(f'{caller_ip} unauthorized')
-        return generate_policy(caller_ip, 'Deny', event['methodArn'])
+        return generate_policy('Deny', event['methodArn'])
+
+    if token.is_expired or token.access_token != request_token:
+        return generate_policy('Deny', event['methodArn'])
+
+    return generate_policy('Allow', event['methodArn'])
 
 
 def get_auth_token(event, context):
-    event_body = json.loads(event["body"])
+
+    print(event)
+    print(event['body'])
+
+    if event['body'] is not None:
+        event_body = json.loads(event["body"])
+    else:
+        return invalid_response("Client authentication failed")
+
     playoff_id = event_body['client_id']
     playoff_secret = event_body['client_secret']
 
@@ -414,11 +422,12 @@ def get_auth_token(event, context):
 
     token = Token.get_token_dynamo('auth', get_original_object=True)
 
+    print('elaboration')
+
     if token is None or int(round(time.time())) >= int(token.expires_at):
         print('LAMBDA token expired')
         token = refresh_token_from_playoff()
     else:
-        print('piiiipi')
         if event["queryStringParameters"] is not None and "refresh" in event["queryStringParameters"] and str(event["queryStringParameters"]["refresh"]) == "1":
             print('Token refresh required')
             route = f"https://api.{HOSTNAME}/v2/design/versions/latest/metrics/s?access_token={token.access_token}"
@@ -431,7 +440,10 @@ def get_auth_token(event, context):
 
     new_result = dict()
     new_result["statusCode"] = 200
-    new_result["body"] = token.get_as_dict
+    new_result["body"] = json.dumps(token.get_as_dict)
+
+    print(new_result)
+
     return new_result
 
 
