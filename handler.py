@@ -1,7 +1,4 @@
-import json
 from playoff import Playoff, PlayoffException
-import json
-import time
 import os
 
 client_id = os.environ.get('PLAYOFF_CLIENT_ID')

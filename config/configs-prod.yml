@@ -1,11 +1,6 @@
 globalAuthorizer: ""
-globalEndPointType: private
-globalVpc:
-  securityGroupIds:
-    - sg-029dd5f46a5b67377
-  subnetIds:
-    - subnet-967d5dfe
-    - subnet-0084e87a
+globalEndPointType: ""
+globalVpc: ""
 additionalResources:
   tokenTable:
     Type: AWS::DynamoDB::Table
@@ -52,28 +47,28 @@ additionalResources:
 customCapacities:
   - table: tokenTable
     read:
-      minimum: 20
-      maximum: 50
+      minimum: 2
+      maximum: 5
       usage: 0.75
     write:
-      minimum: 5
-      maximum: 20
+      minimum: 2
+      maximum: 5
       usage: 0.75
   - table: usersInfoTable
     read:
-      minimum: 5
-      maximum: 50
+      minimum: 2
+      maximum: 5
       usage: 0.75
     write:
-      minimum: 5
-      maximum: 20
+      minimum: 2
+      maximum: 5
       usage: 0.75
   - table: usersReadyInfoTable
     read:
-      minimum: 5
-      maximum: 50
+      minimum: 2
+      maximum: 5
       usage: 0.75
     write:
-      minimum: 5
-      maximum: 20
+      minimum: 2
+      maximum: 5
       usage: 0.75
