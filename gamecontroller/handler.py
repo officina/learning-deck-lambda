@@ -9,6 +9,10 @@ from .playoff import Playoff, PlayoffException
 
 from .mapping import Mapping
 from .dynamo_models import User, UserReady, Token
+import time
+
+import requests
+import json
 
 HOSTNAME = os.environ.get('PLAYOFF_HOSTNAME')
 # Utils
@@ -32,6 +36,10 @@ def get_playoff_client(state='PUBLISHED'):
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_READY')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_READY')
         po_state = "ready"
+    elif state == 'AUTH':
+        CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_AUTH')
+        CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_AUTH')
+        po_state = "auth"
     else:
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_PUBLISHED')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_PUBLISHED')
@@ -393,3 +401,41 @@ def auth(event, context):
         print(f'{caller_ip} unauthorized')
         return generate_policy(caller_ip, 'Deny', event['methodArn'])
 
+
+def get_auth_token(event, context):
+    event_body = json.loads(event["body"])
+    playoff_id = event_body['client_id']
+    playoff_secret = event_body['client_secret']
+
+    if playoff_id == os.environ.get('PLAYOFF_CLIENT_ID_AUTH') and playoff_secret == os.environ.get('PLAYOFF_CLIENT_SECRET_AUTH'):
+        print('Authorized request')
+    else:
+        return invalid_response("Client authentication failed")
+
+    token = Token.get_token_dynamo('auth', get_original_object=True)
+
+    if token is None or int(round(time.time())) >= int(token.expires_at):
+        print('LAMBDA token expired')
+        token = refresh_token_from_playoff()
+    else:
+        print('piiiipi')
+        if event["queryStringParameters"] is not None and "refresh" in event["queryStringParameters"] and str(event["queryStringParameters"]["refresh"]) == "1":
+            print('Token refresh required')
+            route = f"https://api.{HOSTNAME}/v2/design/versions/latest/metrics/s?access_token={token.access_token}"
+            result = requests.get(route, headers={'Content-Type': 'application/json'})
+            if json.loads(result.content.decode('utf8'))['error'] == 'metric_not_found':
+                return invalid_response("Token refresh not required")
+            else:
+                print('Invalid LAMBDA token')
+                token = refresh_token_from_playoff()
+
+    new_result = dict()
+    new_result["statusCode"] = 200
+    new_result["body"] = token.get_as_dict
+    return new_result
+
+
+def refresh_token_from_playoff():
+    playoff_client = get_playoff_client('AUTH')
+    playoff_client.get_access_token()
+    return Token.get_token_dynamo('auth', get_original_object=True)

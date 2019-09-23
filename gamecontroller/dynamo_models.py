@@ -271,11 +271,23 @@ class Token(Model):
         print("set_token_dynamo END")
 
     @classmethod
-    def get_token_dynamo(cls, po_state):
+    def get_token_dynamo(cls, po_state, get_original_object=False):
         print(f"LAMBDA - get_token_dynamo START with state {po_state}")
         try:
             tk = list(cls.scan(cls.token == f"{TOKEN_TABLE_NAME}_{po_state}"))[0]
             print("LAMBDA - get_token_dynamo FINISHED")
-            return tk and tk.attribute_values or None
-        except:
+            if get_original_object:
+                return tk
+            else:
+                return tk and tk.attribute_values or None
+        except Exception as e:
+            print(e)
             return None
+
+    @property
+    def get_as_dict(self):
+        return {
+            "access_token": self.access_token,
+            "expires_at": self.expires_at,
+            "token_type": self.token_type
+        }
