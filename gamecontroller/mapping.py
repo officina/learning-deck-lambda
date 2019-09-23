@@ -64,7 +64,7 @@ class Mapping:
         self.response['body']['world']['points'] = points
         # self.response['body']['world']['available'] = available
         self.response['body']['world']['points']['upgrade'] = self.upgrade
-        self.response['body']['challenges'] = self.get_challenges(weeks)
+        self.response['body']['challenges'] = self.get_challenges_grouped(weeks)
         self.response['body']['progress']['params'] = self.get_progress()
         self.response['body']['progress']['ranking'] = ranking
         self.response['body']['timestamp'] = int(datetime.now().timestamp())
@@ -131,6 +131,29 @@ class Mapping:
         return {
             "available": weeks,
             "completed": challenges
+        }
+
+    def get_challenges_grouped(self, weeks):
+
+        challenges = []
+        for score in self.result['scores']:
+            if 'metric' in score and 'value' in score:
+                metric = score['metric']
+                chapter = {
+                    "id": metric['id'],
+                    "completed": []
+                }
+                if metric.get('type', None) == 'set':
+                    for item in score['value']:
+                        if int(item['count']) == 1:
+                            chapter['completed'].append(item['name'])
+
+                if len(chapter['completed']) > 0:
+                    challenges.append(chapter)
+
+        return {
+            "available": weeks,
+            "chapters": challenges
         }
 
     def get_progress(self):

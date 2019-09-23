@@ -113,23 +113,25 @@ functions:
           path: ${opt:project_name}/levelupgrade/{player}
           method: put
           cors: true
-  get_lazy_users:
-    handler: handler_stub.get_lazy_users
+#  get_lazy_users:
+#    handler: handler_stub.get_lazy_users
+#    timeout: 10
+#    events:
+#      - http:
+#          path: ${opt:project_name}/lazyusers/{from}
+#          method: get
+#          cors: true
+#          authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
+  get_auth_token:
+    handler: handler_stub.get_auth_token
     timeout: 10
     events:
       - http:
-          path: ${opt:project_name}/lazyusers/{from}
-          method: get
+          path: ${opt:project_name}/auth-token
+          method: post
           cors: true
           authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
-#  reset_players:
-#    handler: handler_stub.reset_players
-#    timeout: 300
-#    events:
-#      - schedule:
-#          rate: cron(0 9,13 ? * MON-FRI *)
-#      - schedule:
-#          rate: cron(0 15 ? * MON-THU *)
+
 resources:
   Resources:
     ${file(config/configs-${opt:stage, self:provider.stage}.yml):additionalResources}

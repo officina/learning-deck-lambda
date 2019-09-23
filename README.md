@@ -48,4 +48,4 @@ Get user status in ambiente QA:
         `node_modules/serverless/bin/serverless invoke local -f get_user_status -p tests/data/data_get_user_status_qa.json --stage qa --playoff_hostname playoffgenerali.it`
     
 Get user status in ambiente DEV:  
-        `node_modules/serverless/bin/serverless invoke local -f get_user_status -p tests/data/data_get_user_status_qa.json`
+        `node_modules/serverless/bin/serverless invoke local -f get_user_status -p tests/data/data_get_user_status_qa.json --project_name lrm`
