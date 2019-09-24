@@ -45,6 +45,8 @@ provider:
      PLAYOFF_CLIENT_SECRET_READY: "${self:custom.secrets.PLAYOFF_CLIENT_SECRET_READY}"
      PLAYOFF_CLIENT_ID_PUBLISHED: "${self:custom.secrets.PLAYOFF_CLIENT_ID_PUBLISHED}"
      PLAYOFF_CLIENT_SECRET_PUBLISHED: "${self:custom.secrets.PLAYOFF_CLIENT_SECRET_PUBLISHED}"
+     PLAYOFF_CLIENT_ID_AUTH: "${self:custom.secrets.PLAYOFF_CLIENT_ID_AUTH}"
+     PLAYOFF_CLIENT_SECRET_AUTH: "${self:custom.secrets.PLAYOFF_CLIENT_SECRET_AUTH}"
 
      PLAYOFF_PROFILE_CACHE_DURATION_IN_MINUTES: '720'
      PLAYOFF_RANKING_CACHE_DURATION_IN_MINUTES: '720'
@@ -95,7 +97,7 @@ functions:
           path: ${opt:project_name}/play/{player}
           method: put
           cors: true
-          authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
+          authorizer: authorizerUser
   get_user_status:
     handler: handler_stub.user_status_action
     timeout: 10
@@ -104,15 +106,15 @@ functions:
           path: ${opt:project_name}/userstatus/{player}
           method: get
           cors: true
-          authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
-  level_upgrade:
-    handler: handler_stub.level_upgrade
-    timeout: 10
-    events:
-      - http:
-          path: ${opt:project_name}/levelupgrade/{player}
-          method: put
-          cors: true
+          authorizer: authorizerUser
+#  level_upgrade:
+#    handler: handler_stub.level_upgrade
+#    timeout: 10
+#    events:
+#      - http:
+#          path: ${opt:project_name}/levelupgrade/{player}
+#          method: put
+#          cors: true
 #  get_lazy_users:
 #    handler: handler_stub.get_lazy_users
 #    timeout: 10
@@ -130,7 +132,6 @@ functions:
           path: ${opt:project_name}/auth-token
           method: post
           cors: true
-          authorizer: ${file(config/configs-${opt:stage, self:provider.stage}.yml):globalAuthorizer}
 
 resources:
   Resources:

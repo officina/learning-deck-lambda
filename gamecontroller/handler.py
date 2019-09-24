@@ -9,21 +9,25 @@ from .playoff import Playoff, PlayoffException
 
 from .mapping import Mapping
 from .dynamo_models import User, UserReady, Token
+import time
+
+import requests
+import json
 
 HOSTNAME = os.environ.get('PLAYOFF_HOSTNAME')
 # Utils
 
 
 def invalid_response(message):
-    return {"statusCode": 400, "body": {"message": message}}
+    return {"statusCode": 400, "body": json.dumps({"message": message})}
 
 
 def playoff_player_not_found_error_response(message):
-    return {"statusCode": 404, "body": {"message": message}}
+    return {"statusCode": 404, "body": json.dumps({"message": message})}
 
 
 def playoff_error_response(message):
-    return {"statusCode": 500, "body": {"message": message}}
+    return {"statusCode": 500, "body": json.dumps({"message": message})}
 
 
 def get_playoff_client(state='PUBLISHED'):
@@ -32,6 +36,10 @@ def get_playoff_client(state='PUBLISHED'):
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_READY')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_READY')
         po_state = "ready"
+    elif state == 'AUTH':
+        CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_AUTH')
+        CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_AUTH')
+        po_state = "auth"
     else:
         CLIENT_ID = os.environ.get('PLAYOFF_CLIENT_ID_PUBLISHED')
         CLIENT_SECRET = os.environ.get('PLAYOFF_CLIENT_SECRET_PUBLISHED')
@@ -159,9 +167,9 @@ def get_weeks(player, state="PUBLISHED"):
     return weeks
 
 
-def generate_policy(ip, effect, resource):
+def generate_policy(effect, resource):
     auth_response = dict()
-    auth_response['principalId'] = ip
+    # auth_response['principalId'] = ip
 
     if effect and resource:
         policy_document = {
@@ -378,18 +386,68 @@ def reset_players():
 
 def auth(event, context):
     print(event)
-    # necessario lo split, vedi qui:
-    # https://stackoverflow.com/questions/33062097/how-can-i-retrieve-a-users-public-ip-address-via-amazon-api-gateway-lambda-n
-    caller_ip = event['headers']['X-Forwarded-For'].split(",")[0]
-    dynamo_db = boto3.resource('dynamodb').Table(os.environ['DYNAMODB_IP_AUTH_TABLE'])
-    key = dict()
-    key["ip"] = caller_ip
-    response_result = dynamo_db.get_item(Key=key)
-    # return generatePolicy(1, 'Allow', event['methodArn'])
-    if "Item" in response_result:
-        print(f'{caller_ip} authorized')
-        return generate_policy(caller_ip, 'Allow', event['methodArn'])
-    else:
-        print(f'{caller_ip} unauthorized')
-        return generate_policy(caller_ip, 'Deny', event['methodArn'])
+    token = Token.get_token_dynamo('auth', get_original_object=True)
 
+    if token is None:
+        return generate_policy('Deny', event['methodArn'])
+
+    if 'authorizationToken' in event:
+        request_token = event['authorizationToken']
+    else:
+        return generate_policy('Deny', event['methodArn'])
+
+    if token.is_expired or token.access_token != request_token:
+        return generate_policy('Deny', event['methodArn'])
+
+    return generate_policy('Allow', event['methodArn'])
+
+
+def get_auth_token(event, context):
+
+    print(event)
+    print(event['body'])
+
+    if event['body'] is not None:
+        event_body = json.loads(event["body"])
+    else:
+        return invalid_response("Client authentication failed")
+
+    playoff_id = event_body['client_id']
+    playoff_secret = event_body['client_secret']
+
+    if playoff_id == os.environ.get('PLAYOFF_CLIENT_ID_AUTH') and playoff_secret == os.environ.get('PLAYOFF_CLIENT_SECRET_AUTH'):
+        print('Authorized request')
+    else:
+        return invalid_response("Client authentication failed")
+
+    token = Token.get_token_dynamo('auth', get_original_object=True)
+
+    print('elaboration')
+
+    if token is None or int(round(time.time())) >= int(token.expires_at):
+        print('LAMBDA token expired')
+        token = refresh_token_from_playoff()
+    else:
+        if event["queryStringParameters"] is not None and "refresh" in event["queryStringParameters"] and str(event["queryStringParameters"]["refresh"]) == "1":
+            print('Token refresh required')
+            route = f"https://api.{HOSTNAME}/v2/design/versions/latest/metrics/s?access_token={token.access_token}"
+            result = requests.get(route, headers={'Content-Type': 'application/json'})
+            if json.loads(result.content.decode('utf8'))['error'] == 'metric_not_found':
+                return invalid_response("Token refresh not required")
+            else:
+                print('Invalid LAMBDA token')
+                token = refresh_token_from_playoff()
+
+    new_result = dict()
+    new_result["statusCode"] = 200
+    new_result["body"] = json.dumps(token.get_as_dict)
+
+    print(new_result)
+
+    return new_result
+
+
+def refresh_token_from_playoff():
+    playoff_client = get_playoff_client('AUTH')
+    playoff_client.get_access_token()
+    return Token.get_token_dynamo('auth', get_original_object=True)

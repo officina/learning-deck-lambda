@@ -75,3 +75,4 @@ def auth(event, context):
 
 def get_auth_token(event, context):
     print(event)
+    return GameController.get_auth_token(event, context)

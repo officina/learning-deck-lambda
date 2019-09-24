@@ -42,10 +42,13 @@ consente di accedere alla tabella dynamo utilizzata.
 ##Esecuzioni lambda
 
 Get user status in ambiente PROD:  
-        `node_modules/serverless/bin/serverless invoke local -f get_user_status -p tests/data/data_get_user_status_prod.json --stage prod`
+        `node_modules/serverless/bin/serverless invoke local -f get_user_status -p tests/data/data_get_user_status_prod.json --stage prod --project_name lrm`
 
 Get user status in ambiente QA:  
         `node_modules/serverless/bin/serverless invoke local -f get_user_status -p tests/data/data_get_user_status_qa.json --stage qa --playoff_hostname playoffgenerali.it`
     
 Get user status in ambiente DEV:  
-        `node_modules/serverless/bin/serverless invoke local -f get_user_status -p tests/data/data_get_user_status_qa.json --project_name lrm`
+        `node_modules/serverless/bin/serverless invoke local -f get_user_status -p tests/data/data_get_user_status_qa.json --project_name lrm`  
+
+Get auth_token in ambiente PROD:  
+        `node_modules/serverless/bin/serverless invoke local -f get_auth_token -p tests/data/data_get_auth_token.json --stage prod --project_name lrm`
