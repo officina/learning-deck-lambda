@@ -1,0 +1,122 @@
+{
+   "resource":"/api/play/{player}",
+   "path":"/api/play/lucia",
+   "httpMethod":"PUT",
+   "headers":{
+      "Accept":"*/*",
+      "Accept-Encoding":"gzip, deflate",
+      "cache-control":"no-cache",
+      "CloudFront-Forwarded-Proto":"https",
+      "CloudFront-Is-Desktop-Viewer":"true",
+      "CloudFront-Is-Mobile-Viewer":"false",
+      "CloudFront-Is-SmartTV-Viewer":"false",
+      "CloudFront-Is-Tablet-Viewer":"false",
+      "CloudFront-Viewer-Country":"IT",
+      "Content-Type":"application/json",
+      "Host":"4hpa9l79pf.execute-api.eu-central-1.amazonaws.com",
+      "Postman-Token":"df8606bb-5a6d-49f3-8ec2-85c9b6657fbf",
+      "User-Agent":"PostmanRuntime/7.3.0",
+      "Via":"1.1 c60d08323363c4861c206b74cb68eeb1.cloudfront.net (CloudFront)",
+      "X-Amz-Cf-Id":"4v6zZ0d3TJzby8ZwGJR7jiEHFVwHDLogFMLfUB1tE-llk1-mTxPcqg==",
+      "X-Amzn-Trace-Id":"Root=1-5ba50258-ffc4ff0e5d61fcd9f8f9ab51",
+      "X-Forwarded-For":"31.27.53.207, 70.132.17.155",
+      "X-Forwarded-Port":"443",
+      "X-Forwarded-Proto":"https"
+   },
+   "multiValueHeaders":{
+      "Accept":[
+         "*/*"
+      ],
+      "Accept-Encoding":[
+         "gzip, deflate"
+      ],
+      "cache-control":[
+         "no-cache"
+      ],
+      "CloudFront-Forwarded-Proto":[
+         "https"
+      ],
+      "CloudFront-Is-Desktop-Viewer":[
+         "true"
+      ],
+      "CloudFront-Is-Mobile-Viewer":[
+         "false"
+      ],
+      "CloudFront-Is-SmartTV-Viewer":[
+         "false"
+      ],
+      "CloudFront-Is-Tablet-Viewer":[
+         "false"
+      ],
+      "CloudFront-Viewer-Country":[
+         "IT"
+      ],
+      "Content-Type":[
+         "application/json"
+      ],
+      "Host":[
+         "4hpa9l79pf.execute-api.eu-central-1.amazonaws.com"
+      ],
+      "Postman-Token":[
+         "df8606bb-5a6d-49f3-8ec2-85c9b6657fbf"
+      ],
+      "User-Agent":[
+         "PostmanRuntime/7.3.0"
+      ],
+      "Via":[
+         "1.1 c60d08323363c4861c206b74cb68eeb1.cloudfront.net (CloudFront)"
+      ],
+      "X-Amz-Cf-Id":[
+         "4v6zZ0d3TJzby8ZwGJR7jiEHFVwHDLogFMLfUB1tE-llk1-mTxPcqg=="
+      ],
+      "X-Amzn-Trace-Id":[
+         "Root=1-5ba50258-ffc4ff0e5d61fcd9f8f9ab51"
+      ],
+      "X-Forwarded-For":[
+         "31.27.53.207, 70.132.17.155"
+      ],
+      "X-Forwarded-Port":[
+         "443"
+      ],
+      "X-Forwarded-Proto":[
+         "https"
+      ]
+   },
+   "queryStringParameters": {
+		"state": "READY"
+	},
+   "multiValueQueryStringParameters":"",
+   "pathParameters":{
+      "player":"nick"
+   },
+   "stageVariables":"",
+   "requestContext":{
+      "resourceId":"h8h3ma",
+      "resourcePath":"/api/play/app/{player}",
+      "httpMethod":"PUT",
+      "extendedRequestId":"Nk1N1E8xliAFbBw=",
+      "requestTime":"21/Sep/2018:14:38:16 +0000",
+      "path":"/dev/api/play/app/lucia",
+      "accountId":"123820204514",
+      "protocol":"HTTP/1.1",
+      "stage":"dev",
+      "requestTimeEpoch":1537540696581,
+      "requestId":"f9faa401-bdab-11e8-b2ac-d73de6896f9e",
+      "identity":{
+         "cognitoIdentityPoolId":"",
+         "accountId":"",
+         "cognitoIdentityId":"",
+         "caller":"",
+         "sourceIp":"31.27.53.207",
+         "accessKey":"",
+         "cognitoAuthenticationType":"",
+         "cognitoAuthenticationProvider":"",
+         "userArn":"",
+         "userAgent":"PostmanRuntime/7.3.0",
+         "user":""
+      },
+      "apiId":"4hpa9l79pf"
+   },
+   "body":"{\"action_id\":\"login\"}",
+   "isBase64Encoded":false
+}

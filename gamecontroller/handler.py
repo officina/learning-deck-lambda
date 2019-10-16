@@ -46,6 +46,8 @@ def get_playoff_client(state='PUBLISHED'):
         po_state = "published"
 
     print(CLIENT_ID)
+    print(CLIENT_SECRET)
+    print(HOSTNAME)
 
     client = Playoff(
         hostname=HOSTNAME,
@@ -265,6 +267,73 @@ def play_action(event, context):
 
     new_result_body = {
         "points": dynamic_points,
+        "params": result["body"]["progress"]["params"]
+    }
+
+    new_result = dict()
+    new_result["statusCode"] = 200
+    new_result["body"] = new_result_body
+    return new_result
+
+
+def play_app_action(event, context):
+    print(event)
+    event_body = json.loads(event["body"])
+    if "action_id" not in event_body:
+        return invalid_response("no action id specified")
+
+    true_action_id = event_body['action_id']
+
+    actions_id = ['Apertura_da_notifica', 'Bot', 'Lancio_no_mdm', 'Lancio_volontario', 'Login', 'metriche',
+                  'Tap_notifica', 'Video']
+
+    if true_action_id not in actions_id:
+        return invalid_response("invalid action id")
+
+    state_ = "PUBLISHED"
+    if event["queryStringParameters"] is not None and "state" in event["queryStringParameters"]:
+        state_ = event["queryStringParameters"]["state"]
+
+    print("PLAY ACTION: before get_playoff_client")
+    playoff_client = get_playoff_client(state_)
+    print("PLAY ACTION: after get_playoff_client")
+
+    player = event['pathParameters']['player']
+
+    try:
+        print(f"Before post - play_app_action for id {true_action_id}")
+        result_post = playoff_client.post(
+            route=f"/runtime/actions/{true_action_id}/play",
+            query={"player_id": player}
+        )
+        print("******************")
+        print("RESULT POST")
+        print(result_post)
+        print("******************")
+
+        if state_ == 'READY':
+            try:
+                UserReady.get(player).save_last_play()
+            except UserReady.DoesNotExist:
+                UserReady(player).save()
+                UserReady.get(player).save_last_play()
+        else:
+            try:
+                User.get(player).save_last_play()
+            except User.DoesNotExist:
+                User(player).save()
+                User.get(player).save_last_play()
+
+    except PlayoffException as err:
+        print(err)
+        if err.name == 'player_not_found':
+            return playoff_player_not_found_error_response(err.message)
+        else:
+            return playoff_error_response(err.message)
+    result = get_user_status(event, context, player, playoff_client=playoff_client, force_update=True)
+
+    new_result_body = {
+        "points": "TBD",
         "params": result["body"]["progress"]["params"]
     }
 

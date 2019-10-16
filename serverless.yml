@@ -98,6 +98,15 @@ functions:
           method: put
           cors: true
           authorizer: authorizerUser
+  play_app_action:
+    handler: handler_stub.play_app_action
+    timeout: 10
+    events:
+      - http:
+          path: ${opt:project_name}/play/app/{player}
+          method: put
+          cors: true
+          authorizer: authorizerUser
   get_user_status:
     handler: handler_stub.user_status_action
     timeout: 10
