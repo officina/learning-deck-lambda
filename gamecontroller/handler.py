@@ -142,7 +142,7 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
     date_last_play = user_info.date_last_play_timestamp_format
 
     print("MAPPING START")
-    result = Mapping(user_profile_info, weeks_info, ranking=ranking, date_last_play=date_last_play).json
+    result = Mapping(user_profile_info, weeks_info, ranking=ranking, date_last_play=date_last_play, date_start=user_info.date_start).json
     print(result)
     if bool(result["body"]["world"]["status"]):
         return result
@@ -331,16 +331,7 @@ def play_app_action(event, context):
         else:
             return playoff_error_response(err.message)
     result = get_user_status(event, context, player, playoff_client=playoff_client, force_update=True)
-
-    new_result_body = {
-        "points": "TBD",
-        "params": result["body"]["progress"]["params"]
-    }
-
-    new_result = dict()
-    new_result["statusCode"] = 200
-    new_result["body"] = new_result_body
-    return new_result
+    return result
 
 
 def user_status_action(event, context):
@@ -456,6 +447,7 @@ def reset_players():
 def auth(event, context):
     print(event)
     token = Token.get_token_dynamo('auth', get_original_object=True)
+    print(f'Stored token: {token.access_token}')
 
     if token is None:
         return generate_policy('Deny', event['methodArn'])
@@ -463,9 +455,14 @@ def auth(event, context):
     if 'authorizationToken' in event:
         request_token = event['authorizationToken']
     else:
+        print('authorizationToken not found inside event')
         return generate_policy('Deny', event['methodArn'])
 
+    print(f'Incoming token: {request_token}')
+
     if token.is_expired or token.access_token != request_token:
+        print(f'Token is expired: {token.is_expired}')
+        print(f'Second check: {token.access_token != request_token}')
         return generate_policy('Deny', event['methodArn'])
 
     return generate_policy('Allow', event['methodArn'])

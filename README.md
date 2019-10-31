@@ -53,5 +53,8 @@ Get user status in ambiente DEV:
 Get auth_token in ambiente PROD:  
         `node_modules/serverless/bin/serverless invoke local -f get_auth_token -p tests/data/data_get_auth_token.json --stage prod --project_name lrm`
         
-Play app_action:  
+Play app_action (azioni statiche):  
         `node_modules/serverless/bin/serverless invoke local -f play_app_action -p tests/data/data_play_app_action.json --stage dev --project_name lrm`
+        
+Authorization ambiente PROD:  
+        `node_modules/serverless/bin/serverless invoke local -f authorizerUser -p tests/data/data_authorization.json --stage prod --project_name lrm` 

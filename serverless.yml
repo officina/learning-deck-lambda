@@ -97,7 +97,9 @@ functions:
           path: ${opt:project_name}/play/{player}
           method: put
           cors: true
-          authorizer: authorizerUser
+          authorizer:
+            name: authorizerUser
+            resultTtlInSeconds: 0
   play_app_action:
     handler: handler_stub.play_app_action
     timeout: 10
@@ -106,7 +108,9 @@ functions:
           path: ${opt:project_name}/play/app/{player}
           method: put
           cors: true
-          authorizer: authorizerUser
+          authorizer:
+            name: authorizerUser
+            resultTtlInSeconds: 0
   get_user_status:
     handler: handler_stub.user_status_action
     timeout: 10
@@ -115,7 +119,9 @@ functions:
           path: ${opt:project_name}/userstatus/{player}
           method: get
           cors: true
-          authorizer: authorizerUser
+          authorizer:
+            name: authorizerUser
+            resultTtlInSeconds: 0
 #  level_upgrade:
 #    handler: handler_stub.level_upgrade
 #    timeout: 10

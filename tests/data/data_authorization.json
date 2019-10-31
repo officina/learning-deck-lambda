@@ -1,0 +1,5 @@
+{
+   "type":"TOKEN",
+   "methodArn":"arn:aws:execute-api:eu-west-1:123820204514:iahexss7hj/prod/PUT/lrm/play/nick/",
+   "authorizationToken":"key=NDI2OGU1NGEtYTQwZS00ZTNlLTlhNjgtZDRiNjEzYWRhMTVi"
+}

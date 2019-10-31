@@ -47,10 +47,11 @@ RESPONSE = {
     }
 }
 
+BADGES_METRIC_ID='bedges'
 
 class Mapping:
 
-    def __init__(self, result, weeks, ranking, date_last_play=0):
+    def __init__(self, result, weeks, ranking, date_last_play=0, date_start=-1):
         """
         :arg result: il risultato dell'interrogazione dello stato a playoff
         :arg weeks: le settimane sbloccate
@@ -64,7 +65,8 @@ class Mapping:
         self.response['body']['world']['points'] = points
         # self.response['body']['world']['available'] = available
         self.response['body']['world']['points']['upgrade'] = self.upgrade
-        self.response['body']['challenges'] = self.get_challenges_grouped(weeks)
+        self.response['body']['challenges'] = self.get_challenges_grouped(weeks, date_start)
+        self.response['body']['badges'] = self.get_badges()
         self.response['body']['progress']['params'] = self.get_progress()
         self.response['body']['progress']['ranking'] = ranking
         self.response['body']['timestamp'] = int(datetime.now().timestamp())
@@ -133,7 +135,7 @@ class Mapping:
             "completed": challenges
         }
 
-    def get_challenges_grouped(self, weeks):
+    def get_challenges_grouped(self, weeks, date_start):
 
         challenges = []
         for score in self.result['scores']:
@@ -143,18 +145,31 @@ class Mapping:
                     "id": metric['id'],
                     "completed": []
                 }
-                if metric.get('type', None) == 'set':
+                if metric.get('type', None) == 'set' and metric.get('id', None) != BADGES_METRIC_ID:
                     for item in score['value']:
-                        if int(item['count']) == 1:
+                        if int(item['count']) > 0:
                             chapter['completed'].append(item['name'])
 
                 if len(chapter['completed']) > 0:
                     challenges.append(chapter)
-
+        from datetime import datetime
         return {
-            "available": weeks,
+            # "available": weeks,
+            "start_date": int(datetime.timestamp(date_start)),
             "chapters": challenges
         }
+
+    def get_badges(self):
+        badges = []
+        for score in self.result['scores']:
+            if 'metric' in score and 'value' in score:
+                metric = score['metric']
+                if metric.get('type', None) == 'set' and metric.get('id', None) == BADGES_METRIC_ID:
+                    for item in score['value']:
+                        if int(item['count']) > 0:
+                            badges.append(item['name'])
+
+        return badges
 
     def get_progress(self):
 
