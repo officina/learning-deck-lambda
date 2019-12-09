@@ -1,7 +1,7 @@
 -f https://pypi.thux.it/
 asn1crypto==0.24.0
 boto3==1.9.225
-botocore==1.12.225
+botocore==1.10.61
 certifi==2019.9.11
 cffi==1.12.3
 chardet==3.0.4

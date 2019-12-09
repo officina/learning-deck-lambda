@@ -1,4 +1,4 @@
-{
+   {
    "resource":"/api/userstatus/{player}",
    "path":"/api/userstatus/player_18555",
    "httpMethod":"GET",
@@ -59,7 +59,7 @@
       ]
    },
    "pathParameters":{
-      "player":"b0cb26451830466ea628c7599a2e2186"
+      "player":"l5dea3d3b305cec240077a413"
    },
    "stageVariables":"",
    "requestContext":{

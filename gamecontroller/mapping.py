@@ -47,7 +47,7 @@ RESPONSE = {
     }
 }
 
-BADGES_METRIC_ID='bedges'
+BADGES_METRIC_ID='badges'
 
 class Mapping:
 

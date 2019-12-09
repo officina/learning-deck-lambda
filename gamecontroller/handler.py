@@ -63,6 +63,7 @@ def get_playoff_client(state='PUBLISHED'):
 
 def get_real_players_count(state='PUBLISHED'):
 
+    print('Get real players count')
     if state == 'READY':
         table_name = os.environ.get('DYNAMODB_USERS_READY_INFO_TABLE')
     else:
@@ -72,7 +73,14 @@ def get_real_players_count(state='PUBLISHED'):
         TableName=table_name
     )
 
+    print("******************************")
+    print("******************************")
+    print(response)
+    print("******************************")
+    print("******************************")
+
     index = [x for x in response['Table']['GlobalSecondaryIndexes'] if x['IndexName'] == 'date_last_play-index']
+    print(f"Get real players count result: {index[0]['ItemCount']}")
     return index[0]['ItemCount']
 
 
@@ -128,8 +136,8 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
         ranking = -1
     else:
         try:
-            total_players = get_real_players_count(state_) + 1
-            # total_players = ranking_info['total']
+            # total_players = get_real_players_count(state_) + 1
+            total_players = ranking_info['total']
             my_position = ranking_info['data'][0]['rank']
             print(f"Ranking calculation with total players {total_players} and my position {my_position}")
             ranking_ = my_position / total_players
@@ -137,6 +145,8 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
             ranking = math.floor((1 - ranking_) * 100) / 100
             print(f"Ranking: {ranking_}")
         except Exception as e:
+            print('RANKING EXCEPTION')
+            print(e)
             ranking = 0.99
 
     date_last_play = user_info.date_last_play_timestamp_format
@@ -284,8 +294,8 @@ def play_app_action(event, context):
 
     true_action_id = event_body['action_id']
 
-    actions_id = ['Apertura_da_notifica', 'Bot', 'Lancio_no_mdm', 'Lancio_volontario', 'Login', 'metriche',
-                  'Tap_notifica', 'Video']
+    actions_id = ['apertura_da_notifica', 'bot', 'lancio_no_mdm', 'lancio_volontario', 'login', 'metriche',
+                  'tap_su_notifica', 'video', 'onboarding']
 
     if true_action_id not in actions_id:
         return invalid_response("invalid action id")
