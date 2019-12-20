@@ -197,13 +197,29 @@ class Mapping:
                 metric = score['metric']
                 if 'type' in metric and 'name' in metric:
                     if metric['id'] == 'skill_1_percentuale':
-                        progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value'])/100
+                        try:
+                            progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value'])/100
+                        except Exception as e:
+                            print(e)
+                            progress[temp_labels[metric['id'].replace('_percentuale', '')]]
                     if metric['id'] == 'skill_2_percentuale':
-                        progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value']) / 100
+                        try:
+                            progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value']) / 100
+                        except Exception as e:
+                            print(e)
+                            progress[temp_labels[metric['id'].replace('_percentuale', '')]]
                     if metric['id'] == 'skill_3_percentuale':
-                        progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value']) / 100
+                        try:
+                            progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value']) / 100
+                        except Exception as e:
+                            print(e)
+                            progress[temp_labels[metric['id'].replace('_percentuale', '')]]
                     if metric['id'] == 'skill_4_percentuale':
-                        progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value']) / 100
+                        try:
+                            progress[temp_labels[metric['id'].replace('_percentuale', '')]] = int(score['value']) / 100
+                        except Exception as e:
+                            print(e)
+                            progress[temp_labels[metric['id'].replace('_percentuale', '')]]
 
         return progress
 

@@ -142,7 +142,7 @@ def get_user_status(event, context, player, playoff_client, force_update=False):
             print(f"Ranking calculation with total players {total_players} and my position {my_position}")
             ranking_ = my_position / total_players
             import math
-            ranking = math.floor((1 - ranking_) * 100) / 100
+            ranking = round(math.floor((1 - ranking_) * 100) / 100, 2)
             print(f"Ranking: {ranking_}")
         except Exception as e:
             print('RANKING EXCEPTION')
